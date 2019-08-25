@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withNetworkConnectivity } from 'react-native-offline'
 // import { Crashlytics} from 'react-native-fabric'
 import { View } from 'react-native-animatable'
 import { navigatorStyle } from './assets'
@@ -61,5 +60,4 @@ class Splash extends Component {
 
 const mapStateToProps = state => ({ state })
 const mapDispatchToProps = dispatch => ({ dispatch })
-Splash = withNetworkConnectivity({ withRedux: true })(Splash)
 export default connect(mapStateToProps, mapDispatchToProps)(Splash)

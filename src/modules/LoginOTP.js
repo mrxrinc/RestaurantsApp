@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { View, ScrollView, TextInput, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
-import IOS from './assets/platform'
+import { Navigation } from 'react-native-navigation'
 import CountDown from 'react-native-countdown-component'
-import { navigatorStyle } from './assets'
+import { IOS, navigatorStyle } from './assets'
 import Modal from 'react-native-modal'
 import ModalView from './components/modalView'
 import { Text, Icon } from './components/font'
@@ -21,8 +21,7 @@ import * as util from './utils'
 
 class LoginOTP extends Component {
 
-  // static options = () => navigatorStyle
-
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     this.state = { 
@@ -35,6 +34,8 @@ class LoginOTP extends Component {
   }
 
   login = () => API.login(this.props, this.state)
+
+  verifyOTP = () => null
 
   showModal = state => { this.setState({ showModal: state }) }
 
@@ -84,7 +85,7 @@ class LoginOTP extends Component {
             <View style={[r.topM100]}>
               <ButtonLight 
                 style={[{  }]}
-                onPress={() => this.props.navigator.push({ screen: 'Login' })}
+                onPress={() => Navigation.push(this.props.componentId, { component : { name: 'Login' } })}
               >
                 <Text
                   size={15} 
@@ -178,14 +179,14 @@ class LoginOTP extends Component {
                   timeToShow={['M', 'S']}
                   timeLabels={{m: '', s: ''}}
                   showSeparator
-                  separatorStyle={{ fontSize: 20 }}
+                  separatorStyle={{ fontSize: 20, color: '#d4d7da', marginBottom: 10 }}
                   onFinish={() => this.showModal(false)}
                 />
               </View>
               <View style={[r.topM20, r.paddH50]}>
                 <ButtonLight 
                   style={[g.bgGreen, r.paddV10, r.round30]}
-                  onPress={() => null}
+                  onPress={this.verifyOTP}
                 >
                   <Text
                     size={15} 

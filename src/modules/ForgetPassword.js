@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Image, ScrollView, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
 import { connect } from 'react-redux'
-import { withNetworkConnectivity } from 'react-native-offline'
 import { View } from 'react-native-animatable'
 // import { Crashlytics} from 'react-native-fabric'
 import { navigatorStyle } from './assets'
@@ -15,7 +14,7 @@ import API from './utils/service'
 import * as util from './utils'
 
 class ForgetPassword extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     this.state={ 
@@ -79,7 +78,7 @@ class ForgetPassword extends Component {
 
         <ScrollView style={[r.full]}>
 
-          <View style={[r.topM70, r.paddH20]}>
+          <View style={[r.topM60, r.paddH20]}>
 
             {this.renderContent()}
 
@@ -124,7 +123,6 @@ class ForgetPassword extends Component {
 
 const mapStateToProps = state => ({ state })
 const mapDispatchToProps = dispatch => ({ dispatch })
-ForgetPassword = withNetworkConnectivity({ withRedux: true })(ForgetPassword)
 export default connect(mapStateToProps, mapDispatchToProps)(ForgetPassword)
 
 

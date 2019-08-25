@@ -30,6 +30,7 @@
 		<string>IRANSansMobile_Bold.ttf</string>
 		<string>chilivery_restaurant.ttf</string>
 		<string>FontAwesome.ttf</string>
+		<string>AntDesign.ttf</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
@@ -59,6 +60,6 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
+	<true/>
 </dict>
 </plist>

@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { View, ScrollView, TextInput, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
 import numeral from 'numeral'
-import { withNetworkConnectivity } from 'react-native-offline'
 // import { Crashlytics} from 'react-native-fabric'
 import { View as AnimView } from 'react-native-animatable'
 import IOS from './assets/platform'
@@ -317,7 +316,6 @@ class EditMenu extends Component {
 
 const mapStateToProps = state => ({ state })
 const mapDispatchToProps = dispatch => ({ dispatch })
-EditMenu = withNetworkConnectivity({ withRedux: true })(EditMenu)
 export default connect(mapStateToProps, mapDispatchToProps)(EditMenu)
 
 const Section = ({ name, children }) => (

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { View, ScrollView, FlatList, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
-import { withNetworkConnectivity } from 'react-native-offline'
 // import { Crashlytics} from 'react-native-fabric'
 import Image from './components/image'
 import Input from './components/input'
@@ -350,7 +349,6 @@ class Comments extends Component {
 
 const mapStateToProps = state => ({ state })
 const mapDispatchToProps = dispatch => ({ dispatch })
-Comments = withNetworkConnectivity({ withRedux: true })(Comments)
 export default connect(mapStateToProps, mapDispatchToProps)(Comments)
 
 const VoteItem = props => (
