@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import MapView, { Polygon, Circle } from 'react-native-maps'
-import { withNetworkConnectivity } from 'react-native-offline'
 import numeral from 'numeral'
 // import { Crashlytics} from 'react-native-fabric'
 import { View } from 'react-native-animatable'
@@ -230,7 +229,6 @@ class DeliveryZone extends Component {
 
 const mapStateToProps = state => ({ state })
 const mapDispatchToProps = dispatch =>  ({ dispatch })
-DeliveryZone = withNetworkConnectivity({ withRedux: true })(DeliveryZone)
 export default connect(mapStateToProps, mapDispatchToProps)(DeliveryZone)
 
 

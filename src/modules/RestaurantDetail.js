@@ -5,7 +5,6 @@ import { View } from 'react-native-animatable'
 import numeral from 'numeral'
 // import { Crashlytics} from 'react-native-fabric'
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps'
-import { withNetworkConnectivity } from 'react-native-offline'
 import LinearGradient from 'react-native-linear-gradient'
 import Image from './components/image'
 import * as asset from './assets'
@@ -256,7 +255,6 @@ class RestaurantDetail extends Component {
 
 const mapStateToProps = state => ({ state })
 const mapDispatchToProps = dispatch => ({ dispatch })
-RestaurantDetail = withNetworkConnectivity({ withRedux: true })(RestaurantDetail)
 export default connect(mapStateToProps, mapDispatchToProps)(RestaurantDetail)
 
 

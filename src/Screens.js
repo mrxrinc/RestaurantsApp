@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React from 'react'
 import { Navigation } from 'react-native-navigation'
+import { ReduxNetworkProvider } from 'react-native-offline'
 
 import Splash from './modules/Splash'
 import Offline from './modules/Offline'
@@ -26,121 +27,161 @@ import Push from './modules/components/push'
 export function registerScreens(store, Provider) {
   Navigation.registerComponent('Splash', () => props => (
     <Provider store={store}>
-      <Splash {...props} />
+      <ReduxNetworkProvider>
+        <Splash {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Splash),
 
   Navigation.registerComponent('Offline', () => props => (
     <Provider store={store}>
-      <Offline {...props} />
+      <ReduxNetworkProvider>
+        <Offline {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Offline),
 
   Navigation.registerComponent('Error', () => props => (
     <Provider store={store}>
-      <Error {...props} />
+      <ReduxNetworkProvider>
+        <Error {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Error),
 
   Navigation.registerComponent('Update', () => props => (
     <Provider store={store}>
-      <Update {...props} />
+      <ReduxNetworkProvider>
+        <Update {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Update),
 
   Navigation.registerComponent('Login', () => props => (
     <Provider store={store}>
-      <Login {...props} />
+      <ReduxNetworkProvider>
+        <Login {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Login),
   
   Navigation.registerComponent('LoginOTP', () => props => (
     <Provider store={store}>
-      <LoginOTP {...props} />
+      <ReduxNetworkProvider>
+        <LoginOTP {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => LoginOTP),
 
   Navigation.registerComponent('ForgetPassword', () => props => (
     <Provider store={store}>
-      <ForgetPassword {...props} />
+      <ReduxNetworkProvider>
+        <ForgetPassword {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => ForgetPassword),
   
   Navigation.registerComponent('ResetPassword', () => props => (
     <Provider store={store}>
-      <ResetPassword {...props} />
+      <ReduxNetworkProvider>
+        <ResetPassword {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => ResetPassword),
   
   Navigation.registerComponent('Dashboard', () => props => (
     <Provider store={store}>
-      <Dashboard {...props} />
+      <ReduxNetworkProvider>
+        <Dashboard {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Dashboard),
   
   Navigation.registerComponent('Home', () => props => (
     <Provider store={store}>
-      <Home {...props} />
+      <ReduxNetworkProvider>
+        <Home {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Home),
   
   Navigation.registerComponent('SalesReport', () => props => (
     <Provider store={store}>
-      <SalesReport {...props} />
+      <ReduxNetworkProvider>
+        <SalesReport {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => SalesReport),
   
   Navigation.registerComponent('FinancialReport', () => props => (
     <Provider store={store}>
-      <FinancialReport {...props} />
+      <ReduxNetworkProvider>
+        <FinancialReport {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => FinancialReport),
   
   Navigation.registerComponent('FinancialReportDetail', () => props => (
     <Provider store={store}>
-      <FinancialReportDetail {...props} />
+      <ReduxNetworkProvider>
+        <FinancialReportDetail {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => FinancialReportDetail),
   
   Navigation.registerComponent('EditMenu', () => props => (
     <Provider store={store}>
-      <EditMenu {...props} />
+      <ReduxNetworkProvider>
+        <EditMenu {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => EditMenu),
   
   Navigation.registerComponent('Comments', () => props => (
     <Provider store={store}>
-      <Comments {...props} />
+      <ReduxNetworkProvider>
+        <Comments {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Comments),
   
   Navigation.registerComponent('More', () => props => (
     <Provider store={store}>
-      <More {...props} />
+      <ReduxNetworkProvider>
+        <More {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => More),
   
   Navigation.registerComponent('DeliveryZone', () => props => (
     <Provider store={store}>
-      <DeliveryZone {...props} />
+      <ReduxNetworkProvider>
+        <DeliveryZone {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => DeliveryZone),
   
   Navigation.registerComponent('RestaurantDetail', () => props => (
     <Provider store={store}>
-      <RestaurantDetail {...props} />
+      <ReduxNetworkProvider>
+        <RestaurantDetail {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => RestaurantDetail),
   
   Navigation.registerComponent('Notification', () => props => (
     <Provider store={store}>
-      <Notification {...props} />
+      <ReduxNetworkProvider>
+        <Notification {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Notification),
   
   Navigation.registerComponent('Push', () => props => (
     <Provider store={store}>
-      <Push {...props} />
+      <ReduxNetworkProvider>
+        <Push {...props} />
+      </ReduxNetworkProvider>
     </Provider>
   ), () => Push)
 

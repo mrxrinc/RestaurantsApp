@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { View, ScrollView } from 'react-native'
 import { connect } from 'react-redux'
-import IOS from './assets/platform'
+import { Navigation } from 'react-native-navigation'
+import { IOS, navigatorStyle } from './assets'
 import { Text } from './components/font'
 import Input from './components/input'
 import { ButtonLight } from './components/button'
@@ -16,7 +17,7 @@ import * as util from './utils'
 
 
 class Login extends Component {
-
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     this.state = { 
@@ -66,7 +67,7 @@ class Login extends Component {
             <View style={[r.topM10]}>
               <ButtonLight 
                 style={[{ width: '60%' }]}
-                onPress={() => this.props.navigator.showModal({ screen: 'ForgetPassword' })}
+                onPress={() => Navigation.showModal({ stack: { children: [{ component: { name: 'ForgetPassword' } }] } })}
               >
                 <Text 
                   bold 

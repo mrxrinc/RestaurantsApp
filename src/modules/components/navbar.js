@@ -4,11 +4,11 @@ import {
   Image,
   TouchableOpacity
 } from 'react-native'
+import { Navigation } from 'react-native-navigation'
 import { Text, Icon } from './font'
 import Rainbow from './rainbow'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
-
 
 export default Navbar = props => (
   <View style={[g.navbar, g.bgPrimaryDark]}>
@@ -38,10 +38,10 @@ export default Navbar = props => (
               onPress={() => {
                 if (!props.resetTo) {
                   props.modal ?
-                    props.navigator.dismissModal() :
-                    props.navigator.pop()
+                    Navigation.dismissModal(props.componentId) :
+                    Navigation.pop(props.componentId)
                 } else {
-                  props.navigator.resetTo(props.resetTo)
+                  Navigation.setStackRoot(props.componentId, [{ component: { name: props.resetTo } }])
                 }
               }}
             >

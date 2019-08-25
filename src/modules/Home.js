@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { ScrollView, RefreshControl } from 'react-native'
 import { View } from 'react-native-animatable'
 import { connect } from 'react-redux'
-import { withNetworkConnectivity } from 'react-native-offline'
 // import { Crashlytics} from 'react-native-fabric'
 import StarRating from 'react-native-star-rating'
 import numeral from 'numeral'
@@ -258,7 +257,6 @@ class Home extends Component {
 
 const mapStateToProps = state =>  ({ state })
 const mapDispatchToProps = dispatch => ({ dispatch })
-Home = withNetworkConnectivity({ withRedux: true })(Home)
 export default connect(mapStateToProps, mapDispatchToProps)(Home)
 
 
