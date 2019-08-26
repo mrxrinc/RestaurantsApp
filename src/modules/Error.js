@@ -12,7 +12,8 @@ import * as g from './styles/general'
 
 
 class Error extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
+  
   render() {
     // analytics.setCurrentScreen('برمودا') 
     const errorCode = this.props.errorCode ? this.props.errorCode : 'تعیین نشده'

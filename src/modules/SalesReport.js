@@ -6,7 +6,7 @@ import numeral from 'numeral'
 // import { Crashlytics} from 'react-native-fabric'
 import PersianCalendarPicker from 'react-native-persian-calendar-picker'
 import Modal from 'react-native-modal'
-import IOS from './assets/platform'
+import { IOS, navigatorStyle } from './assets'
 import Image from './components/image'
 import ModalView from './components/modalView'
 import { Text, Icon } from './components/font'
@@ -16,7 +16,6 @@ import Navbar from './components/navbar'
 import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-import * as asset from './assets'
 import * as util from './utils'
 import API from './utils/service'
 import Loading from './components/loading'
@@ -27,7 +26,7 @@ import Notification from './components/notification'
 const LiveIcon = Anim.createAnimatableComponent(Icon)
 
 class SalesReport extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)

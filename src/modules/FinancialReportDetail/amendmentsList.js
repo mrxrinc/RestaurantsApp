@@ -4,7 +4,7 @@ import { View, FlatList, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
-import IOS from '../assets/platform'
+import { IOS } from '../assets'
 import { Text, Icon } from '../components/font'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
@@ -12,10 +12,9 @@ import * as asset from '../assets'
 import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
-import analytics from '../../constants/analytics'
+// import analytics from '../../constants/analytics'
 
 class AmendmentsList extends Component {
-  static navigatorStyle = asset.navigatorStyle
 
   constructor(props) {
     super(props)
@@ -63,7 +62,7 @@ class AmendmentsList extends Component {
   }
 
   render() {
-    analytics.setCurrentScreen('جزییات گزارش فروش')
+    // analytics.setCurrentScreen('جزییات گزارش فروش')
     return (
       <View style={[r.full, g.bgPrimary]} >
           {this.props.state.loading && !this.props.state.salesReport && <Loading />}

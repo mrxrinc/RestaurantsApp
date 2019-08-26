@@ -12,7 +12,7 @@ import { handleOffline } from './utils'
 // import analytics from '../constants/analytics'
 
 class Offline extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   render() {
     // analytics.setCurrentScreen('آفلاین')

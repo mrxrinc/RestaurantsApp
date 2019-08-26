@@ -8,7 +8,6 @@ import numeral from 'numeral'
 import PersianCalendarPicker from 'react-native-persian-calendar-picker'
 import Modal from 'react-native-modal'
 import ScrollableTabView from 'react-native-scrollable-tab-view'
-import IOS from '../assets/platform'
 import Image from '../components/image'
 import ModalView from '../components/modalView'
 import { Text, Icon } from '../components/font'
@@ -19,20 +18,20 @@ import Tabbar from '../components/tabbar'
 import ScrollableTabBar from '../components/scrollableTabbar'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
-import * as asset from '../assets'
+import { IOS, navigatorStyle } from '../assets'
 import * as util from '../utils'
 import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
 import Notification from '../components/notification'
-import analytics from '../../constants/analytics'
+// import analytics from '../../constants/analytics'
 import OrdersList from './ordersList'
 import AmendmentsList from './amendmentsList'
 
 // const ScrollableTabBar = require('../components/scrollableTabbar')
 
 class FinancialReportDetail extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -106,7 +105,7 @@ class FinancialReportDetail extends Component {
   }
 
   render() {
-    analytics.setCurrentScreen('جزییات گزارش فروش')
+    // analytics.setCurrentScreen('جزییات گزارش فروش')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar

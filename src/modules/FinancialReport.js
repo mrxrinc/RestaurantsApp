@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { View, ScrollView, TextInput, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
+import { Navigation } from 'react-native-navigation'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
 // import { Crashlytics} from 'react-native-fabric'
@@ -16,7 +17,7 @@ import Navbar from './components/navbar'
 import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-import * as asset from './assets'
+import { navigatorStyle } from './assets'
 import * as util from './utils'
 import API from './utils/service'
 import Loading from './components/loading'
@@ -25,7 +26,7 @@ import Notification from './components/notification'
 // import analytics from '../constants/analytics'
 
 class FinancialReport extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -103,11 +104,13 @@ class FinancialReport extends Component {
   }
 
   showReportDetail = (id) => {
-    this.props.navigator.push({
-      screen: 'FinancialReportDetail',
-      animationType: 'fade',
-      passProps: { id }
-    })
+    Navigation.push(this.props.componentId, { 
+      component: {
+      name: 'FinancialReportDetail',
+      passProps: { id },
+      options: { animations: { push: { enabled: false, waitForRender: true } } } 
+      } 
+  })
   }
 
   render() {

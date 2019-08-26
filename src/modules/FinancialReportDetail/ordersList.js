@@ -6,7 +6,7 @@ import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
 import Modal from 'react-native-modal'
 import ModalView from '../components/modalView'
-import IOS from '../assets/platform'
+import { IOS } from '../assets'
 import { Text, Icon } from '../components/font'
 import Button, { ButtonLight } from '../components/button'
 import * as r from '../styles/rinc'
@@ -17,7 +17,6 @@ import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
 
 class OrdersList extends Component {
-  static navigatorStyle = asset.navigatorStyle
 
   constructor(props) {
     super(props)

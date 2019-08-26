@@ -30,7 +30,7 @@ Navigation.events().registerAppLaunchedListener(() => {
         children: [
           {
             component: {
-              name: 'LoginOTP'
+              name: 'Splash'
             }
           }
         ]

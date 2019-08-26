@@ -7,7 +7,7 @@ import numeral from 'numeral'
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps'
 import LinearGradient from 'react-native-linear-gradient'
 import Image from './components/image'
-import * as asset from './assets'
+import { navigatorStyle, mapStyle } from './assets'
 import { Text, Icon } from './components/font'
 // import Button from './components/button'
 import Header from './components/header'
@@ -22,7 +22,7 @@ import API from './utils/service'
 
 
 class RestaurantDetail extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -217,7 +217,7 @@ class RestaurantDetail extends Component {
                             latitudeDelta: 0.003,
                             longitudeDelta: 0.003,
                           }}
-                          customMapStyle={asset.mapStyle}
+                          customMapStyle={mapStyle}
                           style={[r.map, r.wFull, { height: 200 }]}
                         >
                           <Marker coordinate={{ latitude, longitude }}>

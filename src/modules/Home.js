@@ -20,7 +20,7 @@ import Notification from './components/notification'
 // import analytics from '../constants/analytics'
 
 class Home extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)

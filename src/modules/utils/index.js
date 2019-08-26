@@ -1,3 +1,5 @@
+
+import { Navigation } from 'react-native-navigation'
 import j from 'jalaali-js'
 
 export const dateReform = date => {
@@ -13,23 +15,24 @@ export const jalali = date => {
   return `${jalali.jy}/${jalali.jm}/${jalali.jd}`
 }
 
-export const toErrorPage = (code, navigator) => {
-  navigator.resetTo({
-    screen: 'Error',
-    passProps: {
-      errorCode: code
-    }
-  })
+export const toErrorPage = (code, props) => {
+  Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard', passProps: { errorCode: code } } }])
+  // navigator.resetTo({
+  //   screen: 'Error',
+  //   passProps: {
+  //     errorCode: code
+  //   }
+  // })
 }
 
 export const handleOffline = (props, redux = false) => {
   const { navigator, state } = props
   console.log(state.network)
   if (redux === false) {
-    navigator.resetTo({ screen: 'Splash' }) 
+    Navigation.setStackRoot(props.componentId, [{ component: { name: 'Splash' } }])
   } else {
     if(state.network.isConnected === false){
-      navigator.resetTo({ screen: 'Offline' })
+      Navigation.setStackRoot(props.componentId, [{ component: { name: 'Offline' } }])
     } 
     else return null
   }

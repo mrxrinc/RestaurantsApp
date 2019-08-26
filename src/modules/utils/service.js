@@ -1,6 +1,7 @@
 import { AsyncStorage } from 'react-native'
 import axios from 'axios'
 import { checkInternetConnection } from 'react-native-offline'
+import { Navigation } from 'react-native-navigation'
 // import RNExitApp from 'react-native-exit-app'
 import * as api from '../../constants/api'
 import * as util from './index'
@@ -56,7 +57,7 @@ class API {
   localDB = new LocalToken
 
   versionControl = props => {
-    const { navigator, dispatch } = props
+    const { dispatch } = props
     dispatch(action.loadingStart())
     checkInternetConnection()
     .then(isConnected => {
@@ -90,7 +91,7 @@ class API {
             }
             dispatch(action.update(data))
             if(isForce || isNormal) {
-              navigator.resetTo({ screen: 'Update' })
+              Navigation.setStackRoot(props.componentId, [{ component: { name: 'Update' } }])
             } else {
               this.appInit(props)
             }
@@ -106,12 +107,12 @@ class API {
         .catch(err => {
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
-          // navigator.resetTo({ screen: 'Offline' })
+          Navigation.setStackRoot(props.componentId, [{ component: { name: 'Offline' } }])
           console.log('VERSION CONTROL CATCH ERROR', err)
         })
       } else {
         console.log('IS_CONNECTED IS FALSE')
-        navigator.resetTo({ screen: 'Offline' })
+        Navigation.setStackRoot(props.componentId, [{ component: { name: 'Offline' } }])
       }
     })
     .catch(err => {
@@ -121,7 +122,7 @@ class API {
   }
 
   appInit = async props => {
-    const { navigator, dispatch } = props
+    const { dispatch } = props
     try {
       dispatch(action.loadingStart())
       this.localDB.getData()
@@ -143,10 +144,7 @@ class API {
               const firstToken = resp.data.result.session.token
               console.log('FRESH USER. FIRST TOKEN ===> ', firstToken)
               dispatch(action.loadingEnd())
-              navigator.resetTo({
-                screen: 'LoginOTP',
-                passProps: { firstToken }
-              })
+              Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP', passProps: { firstToken } } }])
             } else {
               console.log('INIT STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingEnd())
@@ -189,20 +187,20 @@ class API {
                 }
                 dispatch(action.loadingEnd())
                 dispatch(action.storeUser(newData))
-                navigator.push({ screen: 'Dashboard' })
+                Navigation.push(props.componentId, { component : { name: 'Dashboard' } })
               } else {
                 console.log('CURRENT USER DETAIL STATUS FALSE ===> ', resp.data)
                 dispatch(action.loadingEnd())
                 this.localDB.clearData() // in case of broken local data
-                // util.toErrorPage(1011, navigator)
-                navigator.resetTo({ screen: 'Login' })
+                // util.toErrorPage(1011, props)
+                Navigation.setStackRoot(props.componentId, [{ component: { name: 'Login' } }])
               }
             })
             .catch(err => {
               console.log('FAIL ON GETTING USER DETAIL REQUEST ===> ', err)
               dispatch(action.loadingEnd())
               // dont clear local token here, coz if its broken we will get status false as we removing it there.
-              util.toErrorPage(1028, navigator)
+              util.toErrorPage(1028, props)
             })
         }
       })
@@ -216,7 +214,7 @@ class API {
     catch(err) {
       console.log('ERROR ON APPINIT TRY_CATCH!', err)
       dispatch(action.loadingEnd())
-      util.toErrorPage(1012, navigator)
+      util.toErrorPage(1012, props)
     }
   }
 
@@ -261,7 +259,7 @@ class API {
             dispatch(action.storeUser(resp.data))
             this.localDB.setData(resp.data.result.session.token)
             axios.defaults.headers.common['token'] = resp.data.result.session.token
-            navigator.resetTo({ screen: 'Dashboard' })
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard' } }])
             console.log('TOKEN SAVED TO LOCAL') 
           } else {
             console.log('LOGIN STATUS FALSE ===> ', resp)
@@ -288,7 +286,7 @@ class API {
   }
 
   logout = props => {
-    const { dispatch, navigator } = props
+    const { dispatch } = props
     dispatch(action.loadingIIStart())
     axios({
       method: 'get',
@@ -301,7 +299,7 @@ class API {
         dispatch(action.storeUser(null))
         this.localDB.clearData()
         this.localDB.clearChosenRestaurant()
-        navigator.resetTo({ screen: 'Login' }) 
+        Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
       } else {
         console.log('LOGOUT STATUS FALSE ', resp.data)
         dispatch(action.loadingIIEnd())
@@ -329,7 +327,7 @@ class API {
         identification: username
       }
     })
-    .then( resp => {
+    .then(resp => {
       console.log('FORGET_PASSWORD STATUS TRUE ', resp.data)
       if(resp.data.status) {
         dispatch(action.loadingIIEnd())
@@ -367,15 +365,35 @@ class API {
   }
 
   showPush = (props, option) => {
-    const { navigator } = props
-    navigator.showInAppNotification({
-      screen: 'Push',
-      passProps: { 
-        message: option.message,
-        status: option.status ? option.status : null
-      },
-      autoDismissTimerSec: option.timer ? option.timer : 2
-    })
+    const { dispatch } = props
+    // navigator.showInAppNotification({
+    //   screen: 'Push',
+    //   passProps: { 
+    //     message: option.message,
+    //     status: option.status ? option.status : null
+    //   },
+    //   autoDismissTimerSec: option.timer ? option.timer : 2
+    // })
+    // Navigation.showOverlay({
+    //   component: {
+    //     name: 'Push',
+    //     passProps: { 
+    //       message: option.message,
+    //       status: option.status ? option.status : null
+    //     },
+    //     options: {
+    //       overlay: {
+    //         interceptTouchOutside: true
+    //       }
+    //     }
+    //   }
+    // })
+
+    this.showNotification({
+      title: 'خطا!',
+      message: option.message,
+      type: 'alarm'
+    }, dispatch)
   }
 
   dashboard = (props, choosing = false) => {
@@ -383,7 +401,7 @@ class API {
     this.localDB.getChosenRestaurant()
     .then(chosenRestaurant => {
       if(!!chosenRestaurant && choosing === false){
-        this.currentRestaurant(navigator, dispatch, parseInt(chosenRestaurant)) // this will head to home 
+        this.currentRestaurant(props, dispatch, parseInt(chosenRestaurant)) // this will head to home 
       } else {
         dispatch(action.loadingStart())
         axios({
@@ -407,7 +425,7 @@ class API {
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
           if(err.response.data.status === false) {
-            navigator.resetTo({ screen: 'Login' })
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'Login' } }])
             this.showPush(props, {
               message: 'این کاربر دسترسی به پنل ندارد!',
               status: 'error',
@@ -428,14 +446,27 @@ class API {
     })
   }
 
-  currentRestaurant = (navigator, dispatch, id) => {
+  currentRestaurant = (props, dispatch, id) => {
     console.log('CURRENT RESTAURANT ID SET TO ', id)
     dispatch(action.currentRestaurant(id))
     this.localDB.setChosenRestaurant(`${id}`)
-    navigator.resetTo({ 
-      screen: 'Home',
-      animationType: 'fade'
-     })
+    Navigation.setStackRoot(props.componentId, [{ 
+      component: {
+        name: 'Home',
+        options: {
+          animations: {
+            setStackRoot: {
+              enabled: true,
+              animationType: 'fade'
+            }
+          }
+        } 
+      } 
+    }])
+    // navigator.resetTo({ 
+    //   screen: 'Home',
+    //   animationType: 'fade'
+    //  })
   }
 
   home = props => { 
@@ -799,13 +830,13 @@ class API {
         console.log('COMMENTS STATUS TRUE ', resp.data)
         if(resp.data.status) {
           console.log('COMMENTS PAGE NUMBER ', page)
-          // dispatch(action.loadingEnd())
+          dispatch(action.loadingEnd())
           if(page === 1) dispatch(action.loadComments(resp.data))
           else dispatch(action.loadCommentsAdding(resp.data.result.comments))
           console.log('######### from services', resp.data.result.comments)
         } else {
           console.log('COMMENTS STATUS FALSE ', resp.data)
-          // dispatch(action.loadingEnd())
+          dispatch(action.loadingEnd())
           util.toErrorPage(1024, props.navigator)
         }
       })
