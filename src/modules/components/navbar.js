@@ -55,7 +55,12 @@ export default Navbar = props => (
             <TouchableOpacity 
               style={[r.full, r.rtl, r.vCenter, r.paddH10, r.hCenter]}
               onPress={() => {
-                props.navigator.push({ screen: 'Comments', animationType: 'fade' })
+                Navigation.push(props.componentId, { 
+                  component: {
+                    name: 'Comments',
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
+                })
               }}
             >
               <View>

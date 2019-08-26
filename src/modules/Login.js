@@ -18,6 +18,7 @@ import * as util from './utils'
 
 class Login extends Component {
   static options = () => navigatorStyle
+  
   constructor(props) {
     super(props)
     this.state = { 

@@ -8,7 +8,7 @@ import IOS from './assets/platform'
 import Image from './components/image'
 import Modal from './components/modal'
 import ModalView from './components/modalView'
-import * as asset from './assets'
+import { navigatorStyle } from './assets'
 import { Text, Icon } from './components/font'
 import Button, { ButtonLight } from './components/button'
 import Header from './components/header'
@@ -24,7 +24,7 @@ import API from './utils/service'
 
 
 class EditMenu extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)

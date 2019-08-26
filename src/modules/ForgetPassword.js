@@ -5,6 +5,7 @@ import { View } from 'react-native-animatable'
 // import { Crashlytics} from 'react-native-fabric'
 import { navigatorStyle } from './assets'
 import { Text } from './components/font'
+import { IOS } from './assets'
 import Input from './components/input'
 import Navbar from './components/navbar'
 import * as r from './styles/rinc'
@@ -15,6 +16,7 @@ import * as util from './utils'
 
 class ForgetPassword extends Component {
   static options = () => navigatorStyle
+  
   constructor(props) {
     super(props)
     this.state={ 
@@ -23,7 +25,6 @@ class ForgetPassword extends Component {
     // Crashlytics.setString('Screen', 'Forget Password')
   }
   
-
   forgetPassword = () => {
     if(this.props.state.loadingII === false) { 
       API.forgetPassword(this.props, this.state.username)
@@ -68,7 +69,7 @@ class ForgetPassword extends Component {
   render() {
     // analytics.setCurrentScreen('فراموشی رمز عبور')
     return (
-      <KeyboardAvoidingView style={[r.full]} behavior='padding'>
+      <KeyboardAvoidingView style={[r.full]} behavior={IOS ? 'padding' : null}>
         <Navbar
           title={'بازیابی رمز عبور'}
           back
@@ -89,6 +90,7 @@ class ForgetPassword extends Component {
                   label='ایمیل یا شماره موبایل'
                   bold
                   keyboardType={'email-address'}
+                  returnKeyType={'send'}
                   value={this.state.username}
                   onChangeText={username => this.setState({ username: util.toEnglishDigits(username) })}
                   onSubmitEditing={this.forgetPassword}

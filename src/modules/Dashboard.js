@@ -16,7 +16,7 @@ import Notification from './components/notification'
 // import analytics from '../constants/analytics'
 
 class Dashboard extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -64,7 +64,7 @@ class Dashboard extends Component {
                 <Button
                   style={[r.rtl, r.paddH20, r.hCenter, { height: 120 }]}
                   ripple={'#ffffff11'}
-                  onPress={() => API.currentRestaurant(this.props.navigator, this.props.dispatch, item.id)}
+                  onPress={() => API.currentRestaurant(this.props, this.props.dispatch, item.id)}
                 >
                   <View style={[r.round15, r.overhide, { borderColor: '#fff', borderWidth: 5 }]}>
                     <Image

@@ -12,7 +12,7 @@ import API from './utils/service'
 
 
 class Update extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   enterApp = () => {
     API.appInit(this.props)

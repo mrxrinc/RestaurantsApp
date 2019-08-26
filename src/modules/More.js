@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Linking } from 'react-native'
 import { connect } from 'react-redux'
+import { Navigation } from 'react-native-navigation'
 // import { Crashlytics} from 'react-native-fabric'
 import ActionModal from './components/actionModal'
 // import Image from './components/image'
@@ -18,7 +19,7 @@ import API from './utils/service'
 
 
 class More extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     this.state = {
@@ -105,10 +106,12 @@ class More extends Component {
               icon={'store'}
               title={'انتخاب رستوران / شعبه'}
               onPress={() => {
-                this.props.navigator.push({ 
-                  screen: 'Dashboard',
-                  animationType: 'fade',
-                  passProps: { hasBack: true }
+                Navigation.push(this.props.componentId, { 
+                  component: {
+                    name: 'Dashboard',
+                    passProps: { hasBack: true },
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
                 })
               }}
             />
@@ -120,10 +123,14 @@ class More extends Component {
             <RowItem 
               icon={'pins'}
               title={'محدوده سرویس دهی'}
-              onPress={() => this.props.navigator.push({ 
-                screen: 'DeliveryZone',
-                animationType: 'fade',
-               })}
+              onPress={() => {
+                Navigation.push(this.props.componentId, { 
+                  component: {
+                    name: 'DeliveryZone',
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
+                })
+              }}
             />
             <RowItem 
               icon={'phone'}
@@ -150,10 +157,14 @@ class More extends Component {
             <RowItem 
               icon={'info'}
               title={'اطلاعات رستوران'}
-              onPress={() => this.props.navigator.push({ 
-                screen: 'RestaurantDetail',
-                animationType: 'fade',
-               })}
+              onPress={() => {
+                Navigation.push(this.props.componentId, { 
+                  component: {
+                    name: 'RestaurantDetail',
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
+                })
+              }}
             />
             <RowItem 
               icon={'logout'}

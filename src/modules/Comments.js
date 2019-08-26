@@ -6,7 +6,7 @@ import Image from './components/image'
 import Input from './components/input'
 import Modal from './components/modal'
 import ModalView from './components/modalView'
-import * as asset from './assets'
+import { navigatorStyle, window } from './assets'
 import { Text, Icon } from './components/font'
 import Button, { ButtonLight } from './components/button'
 import Header from './components/header'
@@ -21,7 +21,7 @@ import * as g from './styles/general'
 
 
 class Comments extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -282,7 +282,7 @@ class Comments extends Component {
           hide={this.emptyReplyData}
           >
           <ModalView
-            style={[{ height: 300 }, !IOS && { marginTop: asset.window.height - 300 }]} // same problem fixed in android
+            style={[{ height: 300 }, !IOS && { marginTop: window.height - 300 }]} // same problem fixed in android
             visible={this.props.state.reply.visible}
           >
             <View style={[r.bgLight5, r.rtl, r.spaceBetween, r.hCenter, { height: 60 }]}>

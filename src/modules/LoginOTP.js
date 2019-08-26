@@ -20,8 +20,8 @@ import * as util from './utils'
 
 
 class LoginOTP extends Component {
-
   static options = () => navigatorStyle
+  
   constructor(props) {
     super(props)
     this.state = { 

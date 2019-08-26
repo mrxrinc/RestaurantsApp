@@ -11,7 +11,7 @@ import API from './utils/service'
 // import analytics from '../constants/analytics'
 
 class Splash extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     // Crashlytics.setString('Screen', 'Splash')
