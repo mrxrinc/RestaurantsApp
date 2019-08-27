@@ -16,12 +16,12 @@ import * as g from './styles/general'
 import API from './utils/service'
 import Notification from './components/notification'
 import * as util from './utils'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class LoginOTP extends Component {
   static options = () => navigatorStyle
-  
+
   constructor(props) {
     super(props)
     this.state = { 
@@ -31,6 +31,7 @@ class LoginOTP extends Component {
       firstToken: props.firstToken,
       showModal: false
     }
+    analytics.setCurrentScreen('صفحه ورود OTP')
   }
 
   login = () => API.login(this.props, this.state)

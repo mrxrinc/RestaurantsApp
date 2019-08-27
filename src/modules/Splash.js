@@ -8,14 +8,14 @@ import Loading from './components/loading'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 class Splash extends Component {
   static options = () => navigatorStyle
   constructor(props) {
     super(props)
     // Crashlytics.setString('Screen', 'Splash')
-    // analytics.setCurrentScreen('اسپلش')
+    analytics.setCurrentScreen('اسپلش')
   }
 
   componentDidMount() {

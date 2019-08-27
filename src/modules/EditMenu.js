@@ -20,7 +20,7 @@ import EmptyList from './components/emptyList'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class EditMenu extends Component {
@@ -43,6 +43,7 @@ class EditMenu extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Menu')
+    analytics.setCurrentScreen('ویرایش منو')
   }
 
   componentDidMount() {
@@ -91,7 +92,6 @@ class EditMenu extends Component {
   }
  
   render() {
-    // analytics.setCurrentScreen('ویرایش منو')
     return (
       <KeyboardAvoidingView style={[r.full, g.bgPrimary]} behavior='padding'>
         <Navbar

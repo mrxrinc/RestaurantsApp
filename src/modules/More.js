@@ -15,7 +15,7 @@ import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class More extends Component {
@@ -36,6 +36,7 @@ class More extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'More')
+    analytics.setCurrentScreen('بیشتر...')
   }
 
   callPhoneMenu = () => {
@@ -64,7 +65,6 @@ class More extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('بیشتر...')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar

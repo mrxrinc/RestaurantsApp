@@ -11,18 +11,19 @@ import Navbar from './components/navbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 import * as util from './utils'
 
 class ForgetPassword extends Component {
   static options = () => navigatorStyle
-  
+
   constructor(props) {
     super(props)
     this.state={ 
       username: ''
     }
     // Crashlytics.setString('Screen', 'Forget Password')
+    analytics.setCurrentScreen('فراموشی رمز عبور')
   }
   
   forgetPassword = () => {
@@ -67,7 +68,6 @@ class ForgetPassword extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('فراموشی رمز عبور')
     return (
       <KeyboardAvoidingView style={[r.full]} behavior={IOS ? 'padding' : null}>
         <Navbar

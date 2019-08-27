@@ -23,7 +23,7 @@ import API from './utils/service'
 import Loading from './components/loading'
 import ListFooter from './components/listFooter'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 class FinancialReport extends Component {
   static options = () => navigatorStyle
@@ -86,6 +86,7 @@ class FinancialReport extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Financial Report')
+    analytics.setCurrentScreen('گزارش فروش')
   }
 
   componentDidMount() {
@@ -114,7 +115,6 @@ class FinancialReport extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('گزارش فروش')
     return (
       <KeyboardAvoidingView style={[r.full, g.bgPrimary]} behavior='padding'>
         <Navbar

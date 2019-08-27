@@ -13,7 +13,7 @@ import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 class Dashboard extends Component {
   static options = () => navigatorStyle
@@ -24,6 +24,7 @@ class Dashboard extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Dashboard')
+    analytics.setCurrentScreen('داشبورد')
   }
 
   componentDidMount() {
@@ -35,7 +36,6 @@ class Dashboard extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('داشبورد')
     return (
       <View style={[r.full]}>
         <Navbar 

@@ -21,7 +21,7 @@ import API from './utils/service'
 import Loading from './components/loading'
 import ListFooter from './components/listFooter'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 const LiveIcon = Anim.createAnimatableComponent(Icon)
 
@@ -43,6 +43,7 @@ class SalesReport extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Sales Report')
+    analytics.setCurrentScreen('گزارش فروش')
   }
 
   componentDidMount() {
@@ -100,7 +101,6 @@ class SalesReport extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('گزارش فروش')
     const rangeColorFrom = this.state.dateFrom ? '#fff' : '#acb9c6' // to be active or not!
     const rangeColorTo = this.state.dateTo ? '#fff' : '#acb9c6' // to be active or not!
     return (
