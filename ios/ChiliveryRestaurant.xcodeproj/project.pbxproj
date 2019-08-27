@@ -24,6 +24,7 @@
 		E0DE0B73230D252D009EC196 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E0DE0B72230D252D009EC196 /* FontAwesome.ttf */; };
 		E0DE0B75230D2531009EC196 /* IRANSansMobile_Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E0DE0B74230D2531009EC196 /* IRANSansMobile_Bold.ttf */; };
 		E0DE0B77230D2534009EC196 /* IRANSansMobile.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E0DE0B76230D2534009EC196 /* IRANSansMobile.ttf */; };
+		E0E6FA3A2313F63000D09F89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0E6FA392313F63000D09F89 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +87,7 @@
 		E0DE0B72230D252D009EC196 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.ttf; sourceTree = "<group>"; };
 		E0DE0B74230D2531009EC196 /* IRANSansMobile_Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = IRANSansMobile_Bold.ttf; sourceTree = "<group>"; };
 		E0DE0B76230D2534009EC196 /* IRANSansMobile.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = IRANSansMobile.ttf; sourceTree = "<group>"; };
+		E0E6FA392313F63000D09F89 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		F2905AF87CDF4D54A45FF677 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				E0E6FA392313F63000D09F89 /* GoogleService-Info.plist */,
 				E0DE0B78230D254D009EC196 /* Fonts */,
 				13B07FAE1A68108700A75B9A /* ChiliveryRestaurant */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -406,6 +409,7 @@
 				E0DE0B73230D252D009EC196 /* FontAwesome.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				E0E6FA3A2313F63000D09F89 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,7 +758,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chilivery.chiliveryrestaurant;
 				PRODUCT_NAME = ChiliveryRestaurant;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -774,7 +778,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.chilivery.chiliveryrestaurant;
 				PRODUCT_NAME = ChiliveryRestaurant;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
