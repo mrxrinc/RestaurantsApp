@@ -12,7 +12,6 @@ import * as asset from '../assets'
 import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
-// import analytics from '../../constants/analytics'
 
 class AmendmentsList extends Component {
 
@@ -62,7 +61,6 @@ class AmendmentsList extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('جزییات گزارش فروش')
     return (
       <View style={[r.full, g.bgPrimary]} >
           {this.props.state.loading && !this.props.state.salesReport && <Loading />}

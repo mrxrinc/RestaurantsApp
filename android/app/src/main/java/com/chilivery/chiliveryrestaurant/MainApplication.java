@@ -23,6 +23,7 @@ import com.BV.LinearGradient.LinearGradientPackage;
 
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
+import io.invertase.firebase.fabric.crashlytics.RNFirebaseCrashlyticsPackage; 
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +63,8 @@ public class MainApplication extends NavigationApplication {
             new NetInfoPackage(),
             new LinearGradientPackage(),
             new RNFirebasePackage(),
-            new RNFirebaseAnalyticsPackage()
+            new RNFirebaseAnalyticsPackage(),
+            new RNFirebaseCrashlyticsPackage()
           );
       }
   
