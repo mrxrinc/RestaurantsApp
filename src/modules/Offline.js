@@ -9,13 +9,13 @@ import { ButtonLight } from './components/button'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import { handleOffline } from './utils'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 class Offline extends Component {
   static options = () => navigatorStyle
 
   render() {
-    // analytics.setCurrentScreen('آفلاین')
+    analytics.setCurrentScreen('آفلاین')
     return (
       <View style={[r.full, g.bgPrimary, r.center]}>
         <Icon name={'offline'} size={180} style={[g.lightText]}/>

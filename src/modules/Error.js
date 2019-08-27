@@ -8,14 +8,14 @@ import { Text, Icon } from './components/font'
 import { ButtonLight } from './components/button'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class Error extends Component {
   static options = () => navigatorStyle
-  
+
   render() {
-    // analytics.setCurrentScreen('برمودا') 
+    analytics.setCurrentScreen('برمودا') 
     const errorCode = this.props.errorCode ? this.props.errorCode : 'تعیین نشده'
     return (
       <View style={[r.full, g.bgPrimary, r.center]}>

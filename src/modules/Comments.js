@@ -17,7 +17,7 @@ import ListFooter from './components/listFooter'
 import API from './utils/service'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class Comments extends Component {
@@ -32,6 +32,7 @@ class Comments extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Comments')
+    analytics.setCurrentScreen('دیدگاه کاربران')
   }
 
   componentDidMount() {
@@ -79,7 +80,6 @@ class Comments extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('دیدگاه کاربران')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar

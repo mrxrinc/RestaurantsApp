@@ -17,7 +17,7 @@ import Loading from './components/loading'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class DeliveryZone extends Component {
@@ -42,6 +42,7 @@ class DeliveryZone extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'DeliveryZones')
+    analytics.setCurrentScreen('محدوده سرویس دهی')
   }
 
   componentDidMount() {
@@ -98,7 +99,6 @@ class DeliveryZone extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('محدوده سرویس دهی')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
