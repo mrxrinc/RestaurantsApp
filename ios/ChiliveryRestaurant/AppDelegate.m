@@ -13,6 +13,7 @@
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
 
 #import <GoogleMaps/GoogleMaps.h>
+#import <Firebase.h>
 
 @implementation AppDelegate
 
@@ -22,6 +23,7 @@
   [ReactNativeNavigation bootstrap:jsCodeLocation launchOptions:launchOptions];
   
   [GMSServices provideAPIKey:@"AIzaSyC551mKg53pZmuQkQo_hwoK1H7elZ5iC6Q"];
+  [FIRApp configure];
   
 //  RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
 //  RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge

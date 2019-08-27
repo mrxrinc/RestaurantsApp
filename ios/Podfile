@@ -47,9 +47,13 @@ target 'ChiliveryRestaurant' do
   # vector icons
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-
-
+  # react-native-offline
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
+  
+  #RNFirebase
+  pod 'Firebase/Core', '~> 6.3.0'
+  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
+  pod 'GoogleIDFASupport', '~> 3.14.0'
 
   target 'ChiliveryRestaurantTests' do
     inherit! :search_paths

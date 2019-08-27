@@ -1,7 +1,8 @@
-package com.chiliveryrestaurant;
+package com.chilivery.chiliveryrestaurant;
 
 import android.app.Application;
 import android.util.Log;
+import com.facebook.react.BuildConfig;
 
 import com.facebook.react.PackageList;
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
@@ -20,6 +21,9 @@ import com.reactnativenavigation.react.ReactGateway;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
+
+// import io.invertase.firebase.RNFirebasePackage;
+// import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +63,8 @@ public class MainApplication extends NavigationApplication {
             new MapsPackage(),
             new NetInfoPackage(),
             new LinearGradientPackage()
+            // new RNFirebasePackage(),
+            // new RNFirebaseAnalyticsPackage()
           );
       }
   

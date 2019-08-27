@@ -129,12 +129,12 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.chiliveryrestaurant"
+        applicationId "com.chilivery.chiliveryrestaurant"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative60"
-        versionCode 1
-        versionName "1.0"
+        versionCode 100
+        versionName "3.0"
     }
     splits {
         abi {
@@ -208,6 +208,10 @@ dependencies {
     implementation project(':react-native-maps')
     implementation project(':react-native-community-netinfo')
     implementation project(':react-native-linear-gradient')
+    // implementation project(':react-native-firebase')
+    // implementation "com.google.android.gms:play-services-base:16.1.0"
+    // implementation "com.google.firebase:firebase-core:16.0.9"
+    // implementation project(':@react-native-firebase_analytics')
 
     implementation(project(':react-native-maps')){
        exclude group: 'com.google.android.gms', module: 'play-services-base'
@@ -237,4 +241,4 @@ task copyDownloadableDepsToLibs(type: Copy) {
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 
-
+// apply plugin: 'com.google.gms.google-services'

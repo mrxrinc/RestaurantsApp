@@ -17,7 +17,7 @@ import API from './utils/service'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 class Home extends Component {
   static options = () => navigatorStyle
@@ -28,7 +28,7 @@ class Home extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Home')
-    // analytics.setCurrentScreen('صفحه اصلی')
+    analytics.setCurrentScreen('صفحه اصلی')
   }
 
   componentDidMount() {
