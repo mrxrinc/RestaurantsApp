@@ -24,7 +24,7 @@ import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
 import Notification from '../components/notification'
-// import analytics from '../../constants/analytics'
+import analytics from '../../constants/analytics'
 import OrdersList from './ordersList'
 import AmendmentsList from './amendmentsList'
 
@@ -87,6 +87,7 @@ class FinancialReportDetail extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Financial Report')
+    analytics.setCurrentScreen('جزییات گزارش فروش')
   }
 
   componentDidMount() {
@@ -105,7 +106,6 @@ class FinancialReportDetail extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('جزییات گزارش فروش')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
