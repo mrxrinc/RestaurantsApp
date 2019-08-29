@@ -463,10 +463,6 @@ class API {
         } 
       } 
     }])
-    // navigator.resetTo({ 
-    //   screen: 'Home',
-    //   animationType: 'fade'
-    //  })
   }
 
   home = props => { 
@@ -555,6 +551,151 @@ class API {
       dispatch(action.loadingEnd())
       util.handleOffline(props, true)
       util.toErrorPage(1017, props.navigator)
+    })
+  }
+
+  financialReport = (props, paginate = false) => {
+    const { dispatch } = props
+    let page = props.state.financialReport && props.state.financialReport.result.data ? 
+      Math.ceil(props.state.financialReport.result.data.length / 20) : 1
+    page = page === 0 ? 1 : page // avoiding zero division 
+    page = paginate ? page + 1 : 1 // no pagination means all the first data nedded
+    dispatch(action.loadingStart())
+    dispatch(action.hideEmpty({}))
+    const params = {
+      restaurantId: props.state.currentRestaurant,
+      page: 1
+    }
+    axios({
+      method: 'get',
+      url: 'restaurantInvoice/list',
+      params 
+    })
+    .then( resp => {
+      console.log('FINANCIAL_REPORT STATUS TRUE ', resp.data)
+      if(resp.data.status) {
+        dispatch(action.loadingEnd())
+        if(page === 1) dispatch(action.loadFinancialReport(resp.data))
+        else dispatch(action.loadFinancialReportAdding(resp.data.result.data))
+        if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
+      } else {
+        console.log('FINANCIAL_REPORT STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1032, props.navigator)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_REPORT REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1033, props.navigator)
+    })
+  }
+
+  financialOrders = (props, invoiceId, paginate = false) => {
+    const { dispatch } = props
+    let page = props.state.financialOrders && props.state.financialOrders.result.data ? 
+      Math.ceil(props.state.financialOrders.result.data.length / 20) : 1
+      console.log('FINANCIAL_ORDERS PAGE NUMBER ', page)
+    page = page === 0 ? 1 : page // avoiding zero division 
+    page = paginate ? page + 1 : 1 // no pagination means all the first data needed
+    dispatch(action.loadingStart())
+    dispatch(action.hideEmpty({}))
+    const params = {
+      invoiceId,
+      page: 1
+    }
+    axios({
+      method: 'get',
+      url: 'restaurantInvoice/orders',
+      params
+    })
+    .then( resp => {
+      console.log('FINANCIAL_ORDERS STATUS TRUE ', resp.data)
+      if(resp.data.status) {
+        dispatch(action.loadingEnd())
+        if(page === 1) dispatch(action.loadFinancialOrders(resp.data))
+        else dispatch(action.loadFinancialOrdersAdding(resp.data.result.data))
+        if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
+      } else {
+        console.log('FINANCIAL_ORDERS STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1034, props.navigator)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_ORDERS REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1035, props.navigator)
+    })
+  }
+
+  financialOrderDetail = (props, orderId) => {
+    const { dispatch } = props
+    dispatch(action.loadingStart())
+    dispatch(action.loadFinancialOrderDetail(null))
+    const params = { orderId }
+    axios({
+      method: 'get',
+      url: 'order/detailForInvoice',
+      params
+    })
+    .then( resp => {
+      if(resp.data.status) {
+        console.log('FINANCIAL_ORDER_DETAIL STATUS TRUE ', resp.data)
+        dispatch(action.loadingEnd())
+        dispatch(action.loadFinancialOrderDetail(resp.data))
+      } else {
+        console.log('FINANCIAL_ORDER_DETAIL STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1036, props)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_ORDER_DETAIL REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1037, props)
+    })
+  }
+
+  financialAmendments = (props, invoiceId, paginate = false) => {
+    const { dispatch } = props
+    let page = props.state.financialAmendments && props.state.financialAmendments.result.data ? 
+      Math.ceil(props.state.financialAmendments.result.data.length / 20) : 1
+      console.log('FINANCIAL_AMENDMENTS PAGE NUMBER ', page)
+    page = page === 0 ? 1 : page // avoiding zero division 
+    page = paginate ? page + 1 : 1 // no pagination means all the first data needed
+    dispatch(action.loadingStart())
+    dispatch(action.hideEmpty({}))
+    const params = {
+      invoiceId,
+      page: 1
+    }
+    axios({
+      method: 'get',
+      url: 'restaurantInvoice/orderCorrections',
+      params
+    })
+    .then( resp => {
+      console.log('FINANCIAL_AMENDMENTS STATUS TRUE ', resp.data)
+      if(resp.data.status) {
+        dispatch(action.loadingEnd())
+        if(page === 1) dispatch(action.loadFinancialAmendments(resp.data))
+        else dispatch(action.loadFinancialAmendmentsAdding(resp.data.result.data))
+        if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
+      } else {
+        console.log('FINANCIAL_AMENDMENTS STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1036, props)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_AMENDMENTS REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1037, props)
     })
   }
 

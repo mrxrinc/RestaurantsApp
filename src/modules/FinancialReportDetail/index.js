@@ -91,21 +91,18 @@ class FinancialReportDetail extends Component {
   }
 
   componentDidMount() {
-    // this.fetchData()
+    this.fetchData(this.props.invoiceId)
   }
 
-  fetchData = paginate => {
+  fetchData = (invoiceId, paginate) => {
     if(paginate == null) paginate = false
-    console.log('PAGE NUMBER 00', paginate)
-    API.salesReport(this.props, paginate, this.state.dateFrom, this.state.dateTo, this.state.period, this.state.orderId)
-  }
-
-  loadMore = () => {
-    this.fetchData(true) // this adds items to current list
-    // API.salesReport(this.props, true, this.state.dateFrom, this.state.dateTo, this.state.period) // second arg is for pagination
+    API.financialOrders(this.props, invoiceId, paginate)
+    API.financialAmendments(this.props, invoiceId, paginate)
   }
 
   render() {
+    const ordersData = this.props.state.financialOrders ? this.props.state.financialOrders.result : null
+    const amendmentsData = this.props.state.financialAmendments ? this.props.state.financialAmendments.result : null
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
@@ -117,7 +114,7 @@ class FinancialReportDetail extends Component {
 
         <View style={r.full}>
           {/* {this.props.state.loading && !this.props.state.salesReport && <Loading />} */}
-          {this.state.data && (
+          {(ordersData && amendmentsData) && (
             <View
               style={r.full}
               animation={'fadeIn'}
@@ -128,16 +125,16 @@ class FinancialReportDetail extends Component {
               <ScrollableTabView
                 renderTabBar={() => (
                   <ScrollableTabBar 
-                    orders={this.state.ordersCount}
-                    amendments={this.state.amendmentsCount}
+                    orders={(ordersData.data && ordersData.data.length > 0) ? ordersData.data.length : 0}
+                    amendments={(amendmentsData.data && amendmentsData.data.length > 0) ? amendmentsData.data.length : 0}
                   />
                 )}
                 initialPage={1}
                 tabBarActiveTextColor={'#F64559'}
                 tabBarInactiveTextColor={'#697989'}
               >
-                <AmendmentsList tabLabel={'لیست اصلاحیه ها'} />
-                <OrdersList tabLabel={"لیست سفارشات"} />
+                <AmendmentsList tabLabel={'لیست اصلاحیه ها'} invoiceId ={this.props.invoiceId} />
+                <OrdersList tabLabel={"لیست سفارشات"} invoiceId ={this.props.invoiceId} />
               </ScrollableTabView>
 
             </View>

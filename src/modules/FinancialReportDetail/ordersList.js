@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react'
-import { View, FlatList, RefreshControl } from 'react-native'
+import { View, FlatList, ScrollView, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
@@ -21,55 +21,26 @@ class OrdersList extends Component {
   constructor(props) {
     super(props)
     this.state = {
-        data: [
-            {
-              id: 'CHL-INV-4723PK',
-              orderCount: 8,
-              orderCorrectionCount: 2,
-              orderTotalPrices: 250100,
-              orderCorrectionTotalPrices: -30000,
-              price: 220100,
-              createdAt: '1398/05/01',
-              period: '(1398/04/01 تا 1398/04/31)',
-              status: 'در انتظار پرداخت'
-            },
-            {
-              id: 'CHL-INV-51R34P',
-              orderCount: 10,
-              orderCorrectionCount: 1,
-              orderTotalPrices: 275200,
-              orderCorrectionTotalPrices: 5000,
-              price: 280200,
-              createdAt: '1398/04/01',
-              period: '(1398/03/01 تا 1398/03/31)',
-              status: 'پرداخت شده'
-            }
-        ],
+        showModal: false
     }
   }
 
-  componentDidMount() {
-    // this.fetchData()
-  }
-
-  fetchData = paginate => {
-    if(paginate == null) paginate = false
-    console.log('PAGE NUMBER 00', paginate)
-    API.salesReport(this.props, paginate, this.state.dateFrom, this.state.dateTo, this.state.period, this.state.orderId)
-  }
-
   loadMore = () => {
-    this.fetchData(true) // this adds items to current list
-    // API.salesReport(this.props, true, this.state.dateFrom, this.state.dateTo, this.state.period) // second arg is for pagination
+    API.financialOrders(this.props, this.props.invoiceId, true) // third arg is for pagination
   }
 
-  showModal = state => { this.setState({ showModal: state }) }
+  showModal = (state, orderId) => { 
+    this.setState({ showModal: state })
+    if(state) API.financialOrderDetail(this.props, orderId)
+  }
 
   render() {
+    const ordersData = this.props.state.financialOrders ? this.props.state.financialOrders.result : null
+    const modalData = this.props.state.financialOrderDetail ? this.props.state.financialOrderDetail.result : null
     return (
       <View style={[r.full, g.bgPrimary]} >
           {this.props.state.loading && !this.props.state.salesReport && <Loading />}
-          {this.state.data && (
+          {ordersData && (
             <View
               style={[r.full]}
               animation={'fadeIn'}
@@ -79,22 +50,22 @@ class OrdersList extends Component {
             >
 
                 <FlatList 
-                    data={this.state.data}
+                    data={ordersData.data}
                     style={[r.padd15]}
                     keyExtractor={item => item.id}
                     ListFooterComponent={() => (
                         <ListFooter 
-                            items={this.state.data.invoices} 
+                            items={ordersData.data} 
                             loading={this.props.state.loading}
                             onPress={this.loadMore} 
                         />
                     )}
                     renderItem={({ item }) => (
                         <OrderItem
-                            id={'CHL-AX7974YY'}
-                            date={'1398/2/10 - 10:13'}
-                            price={'55690'}
-                            onPress={() => this.showModal(true)}
+                            id={item.id}
+                            date={item.orderPaidAt}
+                            price={item.totalPrice}
+                            onPress={() => this.showModal(true, item.id)}
                         />
                     )}
                 />
@@ -130,7 +101,7 @@ class OrdersList extends Component {
             </View>
             
             {this.props.state.loading && <Loading color={'#A6BCC7'} />}
-            {this.props.state.order && (
+            {modalData && (
               <Anim.View
                 style={[r.full]}
                 animation={'fadeIn'}
@@ -141,33 +112,33 @@ class OrdersList extends Component {
                 <ScrollView showsVerticalScrollIndicator={false}>
                   <OrderDetailRow 
                     right={'شماره فاکتور'}
-                    left={this.props.state.order.result.detail.orderId}
+                    left={modalData.orderId}
                   />
                   <OrderDetailRow 
                     right={'تاریخ و زمان سفارش'}
-                    left={this.props.state.order.result.detail.orderPaidAt}
+                    left={modalData.orderPaidAt}
                   />
                   <OrderDetailRow 
                     right={'نام مشتری'}
-                    left={this.props.state.order.result.detail.userName}
+                    left={modalData.userName}
                   />
                   <OrderDetailRow 
                     right={'شماره همراه مشتری'}
-                    left={this.props.state.order.result.detail.userPhone}
+                    left={modalData.userPhone}
                   />
                   <OrderDetailRow 
                     right={'آدرس مشتری'}
-                    left={this.props.state.order.result.detail.userAddress}
+                    left={modalData.userAddress}
                     multiline={20}
                   />
                   <OrderDetailRow 
                     right={'توضیحات کاربر'}
-                    left={this.props.state.order.result.detail.orderDescription}
+                    left={modalData.orderDescription}
                     multiline={20}
                   />
 
                   <View style={[r.bgLight4, r.round10, r.margin10, r.marginV20]}> 
-                    {this.props.state.order.result.food.map((item, index) => (
+                    {modalData.items.map((item, index) => (
                       <OrderDetailRow 
                         key={index}
                         items
@@ -180,7 +151,7 @@ class OrdersList extends Component {
                             <PriceText>{numeral(item.orderItemPrice).format('0,0')}</PriceText>
                             <PriceText> = </PriceText>
                             <PriceText> تومان </PriceText>
-                            <PriceText>{numeral(item.orderItemCount * item.orderItemPrice).format('0,0')}</PriceText>
+                            <PriceText>{numeral(item.totalOrderItemPrice).format('0,0')}</PriceText>
                           </>
                         )}
                       />
@@ -188,11 +159,11 @@ class OrdersList extends Component {
                     <OrderDetailRow 
                       bold
                       items
-                      right={`مجموع (${this.props.state.order.result.detail.orderItemCount} عدد) `}
+                      right={`مجموع (${modalData.orderItemCount} عدد) `}
                       left={(
                         <>
                           <PriceText bold> تومان </PriceText>
-                          <PriceText bold>{numeral(this.props.state.order.result.detail.totalPriceWithRes).format('0,0')}</PriceText>
+                          <PriceText bold>{numeral(modalData.totalOrderItemPrices).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -201,18 +172,18 @@ class OrdersList extends Component {
                       right={'هزینه بسته بندی'}
                       left={(
                         <>
-                          {this.props.state.order.result.detail.packagingPrice != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(this.props.state.order.result.detail.packagingPrice).format('0,0')}</PriceText>
+                          {modalData.packagingPrice != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.packagingPrice).format('0,0')}</PriceText>
                         </>
                       )}
                     />
                     <OrderDetailRow 
                       items
-                      right={`مالیات بر ارزش افزوده (${this.props.state.order.result.detail.contractFoodVat}%) `}
+                      right={`مالیات بر ارزش افزوده (${modalData.vatPercent}%) `}
                       left={(
                         <>
-                          {this.props.state.order.result.detail.allVat != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(this.props.state.order.result.detail.allVat).format('0,0')}</PriceText>
+                          {modalData.orderVat != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.orderVat).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -220,7 +191,10 @@ class OrdersList extends Component {
                       items
                       right={'تخفیف رستوران'}
                       left={(
-                        <PriceText>%{this.props.state.order.result.detail.restaurantShareDiscountPercent}</PriceText>
+                        <>
+                          {modalData.restaurantDiscount != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.restaurantDiscount).format('0,0')}</PriceText>
+                        </>
                       )}
                     />
                     <OrderDetailRow 
@@ -228,8 +202,8 @@ class OrdersList extends Component {
                       right={'هزینه ارسال'}
                       left={(
                         <>
-                          {this.props.state.order.result.detail.deliveryPrice != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(this.props.state.order.result.detail.deliveryPrice).format('0,0')}</PriceText>
+                          {modalData.deliveryPrice != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.deliveryPrice).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -240,7 +214,7 @@ class OrdersList extends Component {
                       left={(
                         <>
                           <PriceText bold> تومان </PriceText>
-                          <PriceText bold>{numeral(this.props.state.order.result.detail.restaurantOrderPriceShow).format('0,0')}</PriceText>
+                          <PriceText bold>{numeral(modalData.orderTotalPrice).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -301,3 +275,49 @@ const OrderItem = props => (
   </Anim.View>
 )
 
+const OrderDetailRow = props => (
+  <View 
+    style={[
+      r.rtl, r.paddH20, r.hCenter, r.spaceBetween, r.paddV5, g.orderDetailRow, 
+      props.items && [r.paddH10, { minHeight: 50 }]
+    ]}
+  >
+    <View style={[r.leftM30, { flex: 0.8 }]}>
+      <Text 
+        bold={props.bold}
+        size={props.items ? 11 : 15} 
+        height={23} 
+        lineHeight={25} 
+        style={[r.grayDark, r.rtlText, r.rightText]}
+        numberOfLines={1}
+      >
+        {props.right}
+      </Text>
+    </View>
+    <View style={r.full}>
+      {props.items ? (
+        <View style={[r.row, r.leftItems]}>{props.left}</View>
+      ) : (
+        <Text 
+          size={15}
+          height={23} 
+          lineHeight={25} 
+          numberOfLines={props.multiline}
+          style={[
+            r.grayMid, r.leftText, r.ltrText,
+            props.multiline && [r.centerText, r.text12, { lineHeight: 20 }],
+            !props.multiline && [{ height: 20 }]
+          ]}
+        >
+          {props.left}
+        </Text>
+      )}
+    </View>
+  </View>
+)
+
+const PriceText = ({children, bold}) => (
+  <Text bold={bold} size={12} style={[r.grayDark, r.rtlText]}>
+    {children}
+  </Text>
+)

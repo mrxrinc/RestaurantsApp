@@ -6,7 +6,8 @@ import {
 } from 'react-native'
 import { Text } from './font'
 import r from '../styles/rinc'
-
+import { IOS } from '../assets'
+ 
 const createReactClass = require('create-react-class')
 
 const ScrollableTabBar = createReactClass({
@@ -44,7 +45,7 @@ const ScrollableTabBar = createReactClass({
               style={[ r.white, {
                 height: 20,
                 minWidth: 20,
-                paddingTop: 1,
+                paddingTop: IOS ? 3 : 1,
                 paddingHorizontal: 5,
                 textAlign: 'center',
                 textAlignVertical: 'center'

@@ -17,12 +17,6 @@ export const jalali = date => {
 
 export const toErrorPage = (code, props) => {
   Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard', passProps: { errorCode: code } } }])
-  // navigator.resetTo({
-  //   screen: 'Error',
-  //   passProps: {
-  //     errorCode: code
-  //   }
-  // })
 }
 
 export const handleOffline = (props, redux = false) => {
