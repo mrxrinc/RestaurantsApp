@@ -23,5 +23,11 @@ errorsList = {
   1029: 'logout request failed while there is internet connectivity!',
   1030: 'SETTING TOKEN VALUE TO ASYNC STORAGE FAILED! SO LOGIN FAILED BACK TO SPLASH',
   1029: 'forgetPassword request failed while there is internet connectivity!',
+  1032: 'financialReport request status is false',
+  1033: 'financialReport request failed while there is internet connectivity!',
+  1034: 'financialOrders request status is false',
+  1035: 'financialOrders request failed while there is internet connectivity!',
+  1036: 'financialAmendments request status is false',
+  1037: 'financialAmendments request failed while there is internet connectivity!',
   
 }
