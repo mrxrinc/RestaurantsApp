@@ -52,7 +52,7 @@ class LocalToken {
   }
 }
 
-class API {
+class API { //exported to use in loginOTP page
 
   localDB = new LocalToken
 
@@ -221,7 +221,7 @@ class API {
   login = (props, data) => {
     console.log('LOGIN INPUT DATA ==> ', data)
     const { username, password, firstToken } = data
-    const { navigator, dispatch } = props
+    const { dispatch } = props
     if(!props.state.loading) { // preventing double tap while one request is on progress!
       dispatch(action.loadingStart())
       if(username.trim().length === 0) {
@@ -280,6 +280,69 @@ class API {
             message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
             type: 'error'
           }, dispatch)
+        })
+      }
+    }
+  }
+
+  loginOtp = (props, data) => {
+    console.log('OTP INPUT DATA ==> ', data)
+    const { recipient, secret, otp } = data
+    const { dispatch } = props
+    if(!props.state.loading) { // preventing double tap while one request is on progress!
+      dispatch(action.loadingStart())
+      if(otp.trim().length === 0) {
+        dispatch(action.loadingEnd())
+        this.showNotification({
+          title: 'خطا!',
+          message: 'لطفا شماره موبایل خود را وارد کنید!',
+          type: 'alarm'
+        }, dispatch)
+      } else {
+        axios({
+          method: 'post',
+          url: api.OTP_URL + 'otp/verify',
+          data: {
+            recipient,
+            otp,
+            secret,
+            platform: api.INIT.platform,
+            build: api.INIT.build,
+            device_id: api.INIT.device_id,
+            deviceId: api.INIT.device_id,
+            device: api.INIT.device
+          }
+        })
+        .then(resp => {
+          if(resp.data.status) {
+            console.log('OTP REQUEST STATUS TRUE ===> ', resp.data)
+            dispatch(action.loadingEnd())
+            dispatch(action.storeUser(resp.data))
+            this.localDB.setData(resp.data.result.session.token)
+            axios.defaults.headers.common['token'] = resp.data.result.session.token
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard' } }])
+            console.log('TOKEN SAVED TO LOCAL') 
+          } else {
+            console.log('OTP REQUEST STATUS FALSE ===> ', resp)
+            dispatch(action.loadingEnd())
+            this.showNotification({
+              title: 'خطا!',
+              message: `${resp.data.message_fa}!`,
+              type: 'error'
+            }, dispatch)
+          }
+          return resp.data
+        })
+        .catch(err => {
+          console.log('OTP REQUEST ERROR ===> ', err)
+          dispatch(action.loadingEnd())
+          util.handleOffline(props, true)
+          this.showNotification({
+            title: 'خطا!',
+            message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
+            type: 'error'
+          }, dispatch)
+          return err
         })
       }
     }
@@ -397,7 +460,7 @@ class API {
   }
 
   dashboard = (props, choosing = false) => {
-    const { dispatch, navigator } = props
+    const { dispatch } = props
     this.localDB.getChosenRestaurant()
     .then(chosenRestaurant => {
       if(!!chosenRestaurant && choosing === false){
@@ -425,7 +488,7 @@ class API {
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
           if(err.response.data.status === false) {
-            Navigation.setStackRoot(props.componentId, [{ component: { name: 'Login' } }])
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
             this.showPush(props, {
               message: 'این کاربر دسترسی به پنل ندارد!',
               status: 'error',
@@ -1150,92 +1213,3 @@ export default new API()
 
 
 
-
-
-
-
-
-
-
-
-
-// some junk code 
-
-// fetch(`${api.URL}user/login`, {
-  //   method: 'POST',
-  //   headers: {
-  //     Accept: 'application/json',
-  //     Authorization: api.Auth,
-  //     token: firstToken,
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({
-  //     username: data.email,
-  //     password: data.password
-  //   })
-  // })
-  // .then(res => res.json())
-  // .then(resp => {
-  //   console.log('LOGIN RESP ===> ', resp)
-  // })
-  // .catch(err => {
-  //   console.log('LOGIN REQUEST ERROR ===> ', err)
-  // })
-  
-  
-  
-// fetch(`${api.URL}food/changeFoodStatus`, { 
-  //   method: 'put',
-  //   headers: {
-  //     'Accept': 'application/json',
-  //     'Content-Type': 'application/json;charset=UTF-8',
-  //     Authorization: api.Auth
-  //   },
-  //   body: JSON.stringify({
-  //     foodId: id,
-  //     foodStatus: status
-  //   }),
-  // })
-  // .then(res => res.json())
-  // .then(resp => {
-  //   console.log(resp)
-  // })
-  // .catch(err => {
-  //   console.log('FIRST CHECK ERR ===> ', err)
-  // })
-
-
-
-
-// some of foosStatusChange junk code _ delete at the end of project
-  // const aa = superGroup.map(a1 => {
-  //   if(a1.groupId  === group.groupId){
-  //     const bb = a1.map(a2 => {
-  //       if(a2.foodOptionId === item.foodOptionId) {
-  //         return { ...a2, status: status === 1 ? 2 : 1 }
-  //       }
-  //       return { ...a2 }
-  //     })
-  //     return { ...a1, bb }
-  //   }
-  // })
-  // if(status === 1) {
-  //   this.loadFoodOptions(props, {
-  //     status: 2,
-  //     ...superGroup
-  //   })
-  //   this.showPush(props, {
-  //     message: resp.data.message_fa,
-  //     timer: 1
-  //   })
-  // } else {
-  //   this.loadFoodOptions(props, {
-  //     status: 1,
-  //     ...superGroup
-  //   })
-  //   this.showPush(props, {
-  //     message: resp.data.message_fa,
-  //     status: 'success',
-  //     timer: 1
-  //   })
-  // }

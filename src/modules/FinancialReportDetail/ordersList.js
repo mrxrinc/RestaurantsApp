@@ -115,12 +115,16 @@ class OrdersList extends Component {
                     left={modalData.orderId}
                   />
                   <OrderDetailRow 
-                    right={'تاریخ و زمان سفارش'}
-                    left={modalData.orderPaidAt}
-                  />
-                  <OrderDetailRow 
                     right={'نام مشتری'}
                     left={modalData.userName}
+                  />
+                  <OrderDetailRow 
+                    right={'وضعیت سفارش'}
+                    left={modalData.orderStatus}
+                  />
+                  <OrderDetailRow 
+                    right={'تاریخ و زمان سفارش'}
+                    left={modalData.orderPaidAt}
                   />
                   <OrderDetailRow 
                     right={'شماره همراه مشتری'}
@@ -139,41 +143,75 @@ class OrdersList extends Component {
 
                   <View style={[r.bgLight4, r.round10, r.margin10, r.marginV20]}> 
                     {modalData.items.map((item, index) => (
-                      <OrderDetailRow 
-                        key={index}
-                        items
-                        right={item.foodName}
-                        left={(
-                          <>
-                            <PriceText>{item.orderItemCount}</PriceText>
-                            <PriceText> x </PriceText>
-                            <PriceText> تومان </PriceText>
-                            <PriceText>{numeral(item.orderItemPrice).format('0,0')}</PriceText>
-                            <PriceText> = </PriceText>
-                            <PriceText> تومان </PriceText>
-                            <PriceText>{numeral(item.totalOrderItemPrice).format('0,0')}</PriceText>
-                          </>
-                        )}
-                      />
+                      <>
+                        <OrderDetailRow 
+                          {...item}
+                          key={index}
+                          items
+                          doubleLine
+                          hasSideDish={item.options.length > 0 ? true : false}
+                          bold
+                          right={item.foodName}
+                          left={(
+                            <>
+                              {item.orderItemCount > 1 && (
+                                <>
+                                  <PriceText>{item.orderItemCount}</PriceText>
+                                  <PriceText> x </PriceText>
+                                  <PriceText> تومان </PriceText>
+                                  <PriceText>{numeral(item.orderItemPrice).format('0,0')}</PriceText>
+                                  <PriceText> = </PriceText>
+                                </>
+                              )}
+                              <PriceText> تومان </PriceText>
+                              <PriceText>{numeral(item.orderItemCount * item.orderItemPrice).format('0,0')}</PriceText>
+                            </>
+                          )}
+                        />
+                        {item.options && item.options.length > 0 && item.options.map((option, index) => (
+                          <View style={[r.rightP30]} key={index}>
+                            <OrderDetailRow
+                              items
+                              sideDish
+                              right={
+                                (item.orderItemCount > 1 && option.totalOptionPrice > 0) ? 
+                                `${option.foodOptionName}  ( ${item.orderItemCount} )` 
+                                : option.foodOptionName
+                              }
+                              left={
+                                (item.orderItemCount > 1 && option.totalOptionPrice > 0 )? (
+                                  <>
+                                    <PriceText> تومان </PriceText>
+                                    <PriceText>{numeral(option.totalOptionPrice).format('0,0')}</PriceText>
+                                  </>
+                                ) : (
+                                  <PriceText style={r.grayLight}> رایگان </PriceText>
+                                )
+                              }
+                            />
+                          </View>
+                        ))}
+                      </>
                     ))}
                     <OrderDetailRow 
                       bold
                       items
-                      right={`مجموع (${modalData.orderItemCount} عدد) `}
+                      right={'مجموع قیمت اصلی غذاها'}
                       left={(
                         <>
                           <PriceText bold> تومان </PriceText>
-                          <PriceText bold>{numeral(modalData.totalOrderItemPrices).format('0,0')}</PriceText>
+                          <PriceText bold>{numeral(modalData.totalMainOrderItemPrices).format('0,0')}</PriceText>
                         </>
                       )}
                     />
                     <OrderDetailRow 
+                      bold
                       items
-                      right={'هزینه بسته بندی'}
+                      right={'مجموع قیمت غذاها با تخفیف'}
                       left={(
                         <>
-                          {modalData.packagingPrice != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(modalData.packagingPrice).format('0,0')}</PriceText>
+                          <PriceText bold> تومان </PriceText>
+                          <PriceText bold>{numeral(modalData.totalOrderItemPrices).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -189,32 +227,80 @@ class OrdersList extends Component {
                     />
                     <OrderDetailRow 
                       items
+                      right={'هزینه بسته بندی'}
+                      left={modalData.packagingPrice != 0 ? (
+                          <>
+                            <PriceText> تومان </PriceText>
+                            <PriceText>{numeral(modalData.packagingPrice).format('0,0')}</PriceText>
+                          </>
+                        ) : (
+                          <PriceText> رایگان </PriceText>
+                        )
+                      }
+                    />
+                    <OrderDetailRow 
+                      items
                       right={'تخفیف رستوران'}
+                      left={modalData.restaurantDiscount != 0 ? (
+                        <>
+                          <PriceText> تومان </PriceText>
+                          <PriceText>{numeral(modalData.restaurantDiscount).format('0,0')}</PriceText>
+                        </>
+                      ) : (
+                        <PriceText> بدون تخفیف </PriceText>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      items
+                      right={'مبلغ پیک رستوران'}
+                      left={modalData.deliveryPrice != 0 ? (
+                        <>
+                          <PriceText> تومان </PriceText>
+                          <PriceText>{numeral(modalData.deliveryPrice).format('0,0')}</PriceText>
+                        </>
+                      ) : (
+                        <PriceText> رایگان </PriceText>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      bold
+                      items
+                      right={'پرداختی مشتری'}
                       left={(
                         <>
-                          {modalData.restaurantDiscount != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(modalData.restaurantDiscount).format('0,0')}</PriceText>
+                          <PriceText bold> تومان </PriceText>
+                          <PriceText bold>{numeral(modalData.orderTotalPrice).format('0,0')}</PriceText>
                         </>
                       )}
                     />
                     <OrderDetailRow 
                       items
-                      right={'هزینه ارسال'}
+                      right={'کمیسیون موتوچیلی'}
                       left={(
                         <>
-                          {modalData.deliveryPrice != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(modalData.deliveryPrice).format('0,0')}</PriceText>
+                          {modalData.motochiliCommission != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.motochiliCommission).format('0,0')}</PriceText>
+                        </>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      items
+                      right={'کمیسیون'}
+                      left={(
+                        <>
+                          {modalData.finalCommission != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.finalCommission).format('0,0')}</PriceText>
                         </>
                       )}
                     />
                     <OrderDetailRow 
                       bold
                       items
-                      right={'پرداختی کاربر'}
+                      right={'پرداختی به رستوران'}
                       left={(
                         <>
                           <PriceText bold> تومان </PriceText>
-                          <PriceText bold>{numeral(modalData.orderTotalPrice).format('0,0')}</PriceText>
+                          <PriceText bold>{numeral(modalData.orderInvoicePrice).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -278,14 +364,17 @@ const OrderItem = props => (
 const OrderDetailRow = props => (
   <View 
     style={[
-      r.rtl, r.paddH20, r.hCenter, r.spaceBetween, r.paddV5, g.orderDetailRow, 
-      props.items && [r.paddH10, { minHeight: 50 }]
+      r.paddH20, r.paddV5, g.orderDetailRow, 
+      !props.doubleLine && [r.rtl, r.spaceBetween, r.hCenter], 
+      props.items && [r.paddH10, { minHeight: 60 }], 
+      props.sideDish && [r.rightP30, { borderBottomWidth: 0, borderTopWidth: 0,  height: 45 }],
+      !props.sideDish && { paddingTop: 5 }
     ]}
   >
     <View style={[r.leftM30, { flex: 0.8 }]}>
       <Text 
         bold={props.bold}
-        size={props.items ? 11 : 15} 
+        size={props.items && !props.doubleLine ? 11 : 14} 
         height={23} 
         lineHeight={25} 
         style={[r.grayDark, r.rtlText, r.rightText]}
@@ -316,8 +405,8 @@ const OrderDetailRow = props => (
   </View>
 )
 
-const PriceText = ({children, bold}) => (
-  <Text bold={bold} size={12} style={[r.grayDark, r.rtlText]}>
+const PriceText = ({children, bold, style}) => (
+  <Text bold={bold} size={12} style={[r.grayDark, r.rtlText, style]}>
     {children}
   </Text>
 )

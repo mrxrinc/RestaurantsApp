@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, ScrollView, TextInput, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
+import axios from 'axios'
 import CountDown from 'react-native-countdown-component'
 import { IOS, navigatorStyle } from './assets'
 import Modal from 'react-native-modal'
@@ -13,10 +14,12 @@ import Navbar from './components/navbar'
 import Loading from './components/loading'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-import API from './utils/service'
+import SERVICES from './utils/service'
 import Notification from './components/notification'
 import * as util from './utils'
 import analytics from '../constants/analytics'
+import * as api from '../constants/api'
+import * as action from '../actions'
 
 
 class LoginOTP extends Component {
@@ -25,18 +28,76 @@ class LoginOTP extends Component {
   constructor(props) {
     super(props)
     this.state = { 
-      phoneNumber: '09114556318',
-      verifyCode: '',
-      verifyCodeLength: 5,
-      firstToken: props.firstToken,
+      recipient: '',
+      channel: 'sms',
+      secret: null,
+      otp: null,
+      otp_length: 5,
       showModal: false
     }
     analytics.setCurrentScreen('صفحه ورود OTP')
+    this.showNotification = SERVICES.showNotification
   }
 
-  login = () => API.login(this.props, this.state)
+  loginOtpRequest = () => {
+    const { recipient, channel } = this.state
+    const { dispatch } = this.props
+    if(!this.props.state.loading) { // preventing double tap while one request is on progress!
+      dispatch(action.loadingStart())
+      if(recipient.trim().length === 0) {
+        dispatch(action.loadingEnd())
+        this.showNotification({
+          title: 'خطا!',
+          message: 'لطفا شماره موبایل خود را وارد کنید!',
+          type: 'alarm'
+        }, dispatch)
+      } else {
+        axios({
+          method: 'post',
+          url: api.OTP_URL + 'otp/request',
+          data: {
+            recipient,
+            channel,
+            platform: api.INIT.platform,
+            build: api.INIT.build,
+            device_id: api.INIT.device_id,
+            device: api.INIT.device
+          }
+        })
+        .then(resp => {
+          if(resp.data.status) {
+            console.log('OTP REQUEST STATUS TRUE ===> ', resp.data)
+            dispatch(action.loadingEnd())
+            this.setState({ 
+              showModal: true,
+              secret: resp.data.result.secret,
+              otp_length: resp.data.result.otp_length
+            })
+          } else {
+            console.log('OTP REQUEST STATUS FALSE ===> ', resp)
+            dispatch(action.loadingEnd())
+            this.showNotification({
+              title: 'خطا!',
+              message: `${resp.data.message_fa}!`,
+              type: 'error'
+            }, dispatch)
+          }
+        })
+        .catch(err => {
+          console.log('OTP REQUEST ERROR ===> ', err)
+          dispatch(action.loadingEnd())
+          util.handleOffline(this.props, true)
+          this.showNotification({
+            title: 'خطا!',
+            message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
+            type: 'error'
+          }, dispatch)
+        })
+      }
+    }
+  }
 
-  verifyOTP = () => null
+  verifyOTP = () => SERVICES.loginOtp(this.props, this.state)
 
   showModal = state => { this.setState({ showModal: state }) }
 
@@ -55,16 +116,17 @@ class LoginOTP extends Component {
               icon={'phone'}
               label={'شماره موبایل'}
               maxLength={11}
+              autoFocuse
               keyboardType={'phone-pad'}
               returnKeyType={'send'}
-              value={this.state.phoneNumber}
-              onChangeText={phoneNumber => this.setState({ phoneNumber: util.toEnglishDigits(phoneNumber) })}
+              value={this.state.recipient}
+              onChangeText={recipient => this.setState({ recipient: util.toEnglishDigits(recipient) })}
             />
 
             <View style={[r.topM50, r.hCenter]}>
               <ButtonLight 
                 style={[g.bgGreen, r.round20, g.btn, r.center, { width: '90%' }]}
-                onPress={() => this.showModal(true)}
+                onPress={this.loginOtpRequest}
               >
                 {this.props.state.loading ? (
                   <Loading />
@@ -137,7 +199,7 @@ class LoginOTP extends Component {
               <View style={[r.wFull, r.center, r.topP30]}>
                   <Text size={12}>
                     رمز پیامکی برای شماره موبایل
-                    <Text bold size={14} style={[r.grayDark]}> {this.state.phoneNumber} </Text>
+                    <Text bold size={14} style={[r.grayDark]}> {this.state.recipient} </Text>
                     ارسال گردید.
                   </Text>
 
@@ -159,13 +221,13 @@ class LoginOTP extends Component {
                 <View style={[r.wFull, r.bgLight1, r.center, r.topP20]}>
                   <TextInput
                     style={[r.wFull, r.centerText, g.primary, r.fa, g.otpInput]}
-                    maxLength={this.state.verifyCodeLength}
+                    maxLength={this.state.otp_length}
                     keyboardType={'number-pad'}
                     returnKeyType={'send'}
                     placeholder={'-----'}
                     placeholderTextColor={'#00000022'}
-                    value={this.state.verifyCode}
-                    onChangeText={verifyCode => this.setState({ verifyCode: util.toEnglishDigits(verifyCode) })}
+                    value={this.state.otp}
+                    onChangeText={otp => this.setState({ otp: util.toEnglishDigits(otp) })}
                   />
                 </View>
 
