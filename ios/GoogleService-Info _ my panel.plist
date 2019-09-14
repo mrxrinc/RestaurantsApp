@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>359654510732-3qht98latdp3ou9o6v3od0moqqgh3plg.apps.googleusercontent.com</string>
+	<string>692839315977-9okod2ag2c3p5o59qo1l1gnn2hujsca7.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.359654510732-3qht98latdp3ou9o6v3od0moqqgh3plg</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>359654510732-qgn7t9eio2i77ni0j6fe5jadto2564s6.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.692839315977-9okod2ag2c3p5o59qo1l1gnn2hujsca7</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAsO1-CfYQfdFJxkRlPS2KYQYcLR-ujue4</string>
+	<string>AIzaSyBtHw8SrRZJIZjONcQBS0F8p4n9o8YSpuo</string>
 	<key>GCM_SENDER_ID</key>
-	<string>359654510732</string>
+	<string>692839315977</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.chilivery.ChiliveryRestaurant</string>
 	<key>PROJECT_ID</key>
-	<string>chilivery-app</string>
+	<string>chiliveryrestaurants</string>
 	<key>STORAGE_BUCKET</key>
-	<string>chilivery-app.appspot.com</string>
+	<string>chiliveryrestaurants.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +29,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:359654510732:ios:9152d393ffa440b2</string>
+	<string>1:692839315977:ios:9152d393ffa440b2</string>
 	<key>DATABASE_URL</key>
-	<string>https://chilivery-app.firebaseio.com</string>
+	<string>https://chiliveryrestaurants.firebaseio.com</string>
 </dict>
 </plist>

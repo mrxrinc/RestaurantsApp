@@ -93,8 +93,8 @@ module.exports = StyleSheet.create({
   },
   orderDetailRow: {
     minHeight: 60,
-    borderBottomColor: '#eee',
-    borderBottomWidth: 1
+    borderTopColor: '#eee',
+    borderTopWidth: 1,
   },
   menuModalGroupHeader: {
     padding: 5,
