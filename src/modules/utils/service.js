@@ -1,7 +1,10 @@
+import React from 'react'
 import { AsyncStorage } from 'react-native'
 import axios from 'axios'
 import { checkInternetConnection } from 'react-native-offline'
 import { Navigation } from 'react-native-navigation'
+import { showMessage, hideMessage } from "react-native-flash-message"
+import Push from '../components/push'
 // import RNExitApp from 'react-native-exit-app'
 import * as api from '../../constants/api'
 import * as util from './index'
@@ -97,9 +100,9 @@ class API { //exported to use in loginOTP page
             }
           } else {
             console.log('VERSION CONTROL STATUS FALSE')
-            this.showPush(props, {
+            this.showPush({
               message: resp.data.message_fa,
-              status: 'error',
+              status: 'danger',
               timer: 3
             })
           }
@@ -107,7 +110,11 @@ class API { //exported to use in loginOTP page
         .catch(err => {
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
-          Navigation.setStackRoot(props.componentId, [{ component: { name: 'Offline' } }])
+          dispatch(action.storeUser(null))
+          this.localDB.clearData()
+          this.localDB.clearChosenRestaurant()
+          Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
+
           console.log('VERSION CONTROL CATCH ERROR', err)
         })
       } else {
@@ -148,9 +155,9 @@ class API { //exported to use in loginOTP page
             } else {
               console.log('INIT STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingEnd())
-              this.showPush(props, {
+              this.showPush({
                 message: resp.data.message_fa,
-                status: 'error',
+                status: 'danger',
                 timer: 3
               })
             }
@@ -159,9 +166,9 @@ class API { //exported to use in loginOTP page
             console.log('ERROR APP INIT REQUEST ===> ', err)
             dispatch(action.loadingEnd())
             util.handleOffline(props, true)
-            this.showPush(props, {
+            this.showPush({
               message: 'مشکلی برای اپلیکیشن پیش آمد. لطفا با پشتیبانی تماس بگیرید!',
-              status: 'error',
+              status: 'danger',
               timer: 3
             })
           })
@@ -266,7 +273,7 @@ class API { //exported to use in loginOTP page
             dispatch(action.loadingEnd())
             this.showNotification({
               title: 'خطا!',
-              message: `${resp.data.message_fa}!`,
+              message: `${resp.data.message_fa}! yo from login`,
               type: 'error'
             }, dispatch)
           }
@@ -327,7 +334,7 @@ class API { //exported to use in loginOTP page
             dispatch(action.loadingEnd())
             this.showNotification({
               title: 'خطا!',
-              message: `${resp.data.message_fa}!`,
+              message: `${resp.data.message_fa}!yo inside services`,
               type: 'error'
             }, dispatch)
           }
@@ -366,9 +373,9 @@ class API { //exported to use in loginOTP page
       } else {
         console.log('LOGOUT STATUS FALSE ', resp.data)
         dispatch(action.loadingIIEnd())
-        this.showPush(props, {
+        this.showPush({
           message: 'این کاربر قبلا خارج شده است!',
-          status: 'error'
+          status: 'danger'
         })
       }
     })
@@ -398,12 +405,11 @@ class API { //exported to use in loginOTP page
       } else {
         console.log('FORGET_PASSWORD STATUS FALSE ', resp.data)
         dispatch(action.loadingIIEnd())
-        this.showPush(props, {
+        this.showPush({
           message: typeof resp.data.message_fa === 'string' ? 
                     `${resp.data.message_fa}!` : 
                     resp.data.message_fa[0].identification[0],
-          status: 'error',
-          timer: 1
+          status: 'danger'
         })
       }
     })
@@ -427,36 +433,14 @@ class API { //exported to use in loginOTP page
     dispatch(action.hideNotification({}))
   }
 
-  showPush = (props, option) => {
-    const { dispatch } = props
-    // navigator.showInAppNotification({
-    //   screen: 'Push',
-    //   passProps: { 
-    //     message: option.message,
-    //     status: option.status ? option.status : null
-    //   },
-    //   autoDismissTimerSec: option.timer ? option.timer : 2
-    // })
-    // Navigation.showOverlay({
-    //   component: {
-    //     name: 'Push',
-    //     passProps: { 
-    //       message: option.message,
-    //       status: option.status ? option.status : null
-    //     },
-    //     options: {
-    //       overlay: {
-    //         interceptTouchOutside: true
-    //       }
-    //     }
-    //   }
-    // })
-
-    this.showNotification({
-      title: 'خطا!',
-      message: option.message,
-      type: 'alarm'
-    }, dispatch)
+  showPush = option => {
+    option = option || {}
+    showMessage({
+      message: option.message ? option.message : '  یک متن تست برای نوتیفیکیشن',
+      type: option.status ? option.status : "default",
+      duration: option.timer || 1850,
+      floating: true
+    })
   }
 
   dashboard = (props, choosing = false) => {
@@ -489,9 +473,9 @@ class API { //exported to use in loginOTP page
           util.handleOffline(props, true)
           if(err.response.data.status === false) {
             Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
-            this.showPush(props, {
+            this.showPush({
               message: 'این کاربر دسترسی به پنل ندارد!',
-              status: 'error',
+              status: 'danger',
               timer: 3
             })
             this.localDB.clearData()
@@ -905,18 +889,16 @@ class API { //exported to use in loginOTP page
       if(resp.data.status) {
         this.editMenu(props, false, superGroup) // this also has LoadingII end and item index for reloading food options modalModal !
         if(status !== 1) {
-          this.showPush(props, {
+          this.showPush({
             message: resp.data.message_fa,
-            status: 'success',
-            timer: 1
+            status: 'success'
           })
         }
       } else {
         console.log('MENU ITEM STATUS CHANGE IS FALSE', resp.data)
-        this.showPush(props, {
+        this.showPush({
           message: resp.data.message_fa,
-          status: 'error',
-          timer: 3
+          status: 'alarm'
         })
       }
     })
@@ -924,10 +906,9 @@ class API { //exported to use in loginOTP page
       console.log('MENU ITEM STATUS CHANGE RQUEST FAILED ', err)
       dispatch(action.loadingIIEnd())
       util.handleOffline(props, true)
-      this.showPush(props, {
+      this.showPush({
         message: 'مشکلی در تغییر وضعیت غذا پیش آمد. لطفا دوباره سعی کنید!',
-        status: 'error',
-        timer: 3
+        status: 'alarm'
       })
     })
   }
@@ -964,10 +945,9 @@ class API { //exported to use in loginOTP page
         this.editMenu(props, false, superGroup) // this also has LoadingII end !
       } else {
         console.log('FOOD_OPTION ITEM STATUS CHANGE IS FALSE', resp.data)
-        this.showPush(props, {
+        this.showPush({
           message: resp.data.message_fa,
-          status: 'error',
-          timer: 3
+          status: 'alarm'
         })
       }
     })
@@ -975,10 +955,9 @@ class API { //exported to use in loginOTP page
       console.log('FOOD_OPTION ITEM STATUS CHANGE RQUEST FAILED ', err)
       dispatch(action.loadingIIEnd())
       util.handleOffline(props, true)
-      this.showPush(props, {
+      this.showPush({
         message: 'مشکلی در تغییر وضعیت غذا پیش آمد. لطفا دوباره سعی کنید!',
-        status: 'error',
-        timer: 3
+        status: 'alarm'
       })
     })
   }
@@ -1077,9 +1056,9 @@ class API { //exported to use in loginOTP page
         if(message.length === 0) {
           console.log('TRIMMED MESSAGE IS ALSO EMPTY!!!!')
           dispatch(action.loadingIIEnd())
-          this.showPush(props, {
+          this.showPush({
             message: 'لطفا متن پیام خود را وارد نمایید!',
-            status: 'error'
+            status: 'danger'
           })
         } else {
           axios({
@@ -1098,16 +1077,16 @@ class API { //exported to use in loginOTP page
               dispatch(action.loadingIIEnd())
               this.unloadReplyData(dispatch)
               this.comments(props, false, true) // args => (props, loading, reload comments after reply)
-              this.showPush(props, {
+              this.showPush({
                 message: resp.data.message_fa,
                 status: 'success'
               })
             } else {
               console.log('REPLY STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingIIEnd())
-              this.showPush(props, {
+              this.showPush({
                 message: `${resp.data.message_fa}!`,
-                status: 'error'
+                status: 'danger'
               })
             }
           })
@@ -1115,19 +1094,19 @@ class API { //exported to use in loginOTP page
             console.log('REPLY REQUEST ERROR ===> ', err)
             dispatch(action.loadingIIEnd())
             util.handleOffline(props, true)
-            this.showPush(props, {
+            this.showPush({
               message: 'مشکلی در درخواست پاسخ پیش آمد! لطفا مجددا تلاش کنید.',
-              status: 'error'
+              status: 'danger'
             })
           })
         }
       } else {
         console.log('MESSAGE IS EMPTY')
         dispatch(action.loadingIIEnd())
-          this.showPush(props, {
-            message: 'لطفا متن پیام خود را وارد نمایید!',
-            status: 'error'
-          })
+        this.showPush({
+          message: 'لطفا متن پیام خود را وارد نمایید!',
+          status: 'danger'
+        })
       }
     }
   }
@@ -1155,9 +1134,9 @@ class API { //exported to use in loginOTP page
             } else {
               console.log('REPORT_COMMENT STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingIIEnd())
-              this.showPush(props, {
+              this.showPush({
                 message: `${resp.data.message_fa}!`,
-                status: 'error'
+                status: 'danger'
               })
             }
           })
@@ -1165,9 +1144,9 @@ class API { //exported to use in loginOTP page
             console.log('REPORT_COMMENT REQUEST ERROR ===> ', err)
             dispatch(action.loadingIIEnd())
             util.handleOffline(props, true)
-            this.showPush(props, {
+            this.showPush({
               message: 'مشکلی در درخواست گزارش پیش آمد! لطفا مجددا تلاش کنید.',
-              status: 'error'
+              status: 'danger'
             })
           })
     }

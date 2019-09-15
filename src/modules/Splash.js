@@ -9,6 +9,8 @@ import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
 import analytics from '../constants/analytics'
+import Notification from './components/notification'
+import FlashMessage from 'react-native-flash-message'
 
 class Splash extends Component {
   static options = () => navigatorStyle
@@ -53,6 +55,9 @@ class Splash extends Component {
             <Loading />
           </View>
         )}
+        
+        <Notification />
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }

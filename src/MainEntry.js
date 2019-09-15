@@ -17,7 +17,7 @@ Navigation.events().registerAppLaunchedListener(() => {
       backgroundColor: '#32434C'
     },
     statusBar: {
-      blur: true,
+      // blur: true,
       drawBehind: true,
       backgroundColor: '#00000011',
       style: 'light'
