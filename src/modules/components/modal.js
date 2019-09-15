@@ -16,7 +16,7 @@ export default CustomModal = props => (
     onBackButtonPress={props.hide}
     animationIn={props.animationIn ? props.animationIn : 'fadeIn'}
     animationOut={props.animationOut ? props.animationOut : 'fadeOut'}
-    backdropOpacity={props.backdrop ? props.backdrop : 0.6}
+    backdropOpacity={props.backdrop ? props.backdrop : 0.3}
     useNativeDriver={props.native ? props.native : true}
     onModalHide={props.onHide ? props.onHide : () => null}
     style={props.style ? props.style : [r.center]}

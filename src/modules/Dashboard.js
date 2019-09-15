@@ -14,6 +14,7 @@ import * as g from './styles/general'
 import API from './utils/service'
 import Notification from './components/notification'
 import analytics from '../constants/analytics'
+import FlashMessage from "react-native-flash-message"
 
 class Dashboard extends Component {
   static options = () => navigatorStyle
@@ -87,7 +88,7 @@ class Dashboard extends Component {
         {!this.props.state.dashboard && <EmptyList icon/> }
 
         <Notification />
-
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }

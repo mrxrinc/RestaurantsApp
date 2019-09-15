@@ -20,6 +20,7 @@ import * as util from './utils'
 import analytics from '../constants/analytics'
 import * as api from '../constants/api'
 import * as action from '../actions'
+import FlashMessage from "react-native-flash-message"
 
 
 class LoginOTP extends Component {
@@ -78,7 +79,7 @@ class LoginOTP extends Component {
             dispatch(action.loadingEnd())
             this.showNotification({
               title: 'خطا!',
-              message: `${resp.data.message_fa}!`,
+              message: `${resp.data.message_fa}!yo in LoginOTP page`,
               type: 'error'
             }, dispatch)
           }
@@ -97,7 +98,11 @@ class LoginOTP extends Component {
     }
   }
 
-  verifyOTP = () => SERVICES.loginOtp(this.props, this.state)
+  verifyOTP = () => {
+    this.setState({ showModal: false }, () => { // dont even ask why I didnt use shoModal function here! just dont ask. JS staff!
+      SERVICES.loginOtp(this.props, this.state)
+    })
+  }
 
   showModal = state => { this.setState({ showModal: state }) }
 
@@ -193,7 +198,7 @@ class LoginOTP extends Component {
               />
             </View>
             
-            {this.props.state.loading && <Loading color={'#A6BCC7'} />}
+            {/* {this.props.state.loading && <Loading color={'#A6BCC7'} />} */}
 
             <ScrollView style={[r.full]}>
               <View style={[r.wFull, r.center, r.topP30]}>
@@ -268,6 +273,7 @@ class LoginOTP extends Component {
         </Modal>
         
         <Notification />
+        <FlashMessage position="top" />
       </View>
     )
   }

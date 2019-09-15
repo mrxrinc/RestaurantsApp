@@ -21,6 +21,7 @@ import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
 import analytics from '../constants/analytics'
+import FlashMessage from 'react-native-flash-message'
 
 
 class EditMenu extends Component {
@@ -308,7 +309,7 @@ class EditMenu extends Component {
         />
 
         <Notification />
-
+        <FlashMessage position="top" style={[r.rtl]} />
       </KeyboardAvoidingView>
     )
   }

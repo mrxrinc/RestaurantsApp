@@ -13,6 +13,7 @@ import * as g from './styles/general'
 import API from './utils/service'
 import analytics from '../constants/analytics'
 import * as util from './utils'
+import FlashMessage from 'react-native-flash-message'
 
 class ForgetPassword extends Component {
   static options = () => navigatorStyle
@@ -118,6 +119,7 @@ class ForgetPassword extends Component {
           </View>
 
         </ScrollView>
+        <FlashMessage position="top" style={[r.rtl]} />
       </KeyboardAvoidingView>
     )
   }

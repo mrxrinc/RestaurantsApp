@@ -18,6 +18,7 @@ import * as r from './styles/rinc'
 import * as g from './styles/general'
 import Notification from './components/notification'
 import analytics from '../constants/analytics'
+import FlashMessage from "react-native-flash-message"
 
 class Home extends Component {
   static options = () => navigatorStyle
@@ -249,7 +250,8 @@ class Home extends Component {
           active = {'home'}
           notificationCount = {null}  // this must be null if we dont have count
         />
-          
+        
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   } 

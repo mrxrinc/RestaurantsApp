@@ -18,6 +18,8 @@ import API from './utils/service'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import analytics from '../constants/analytics'
+import Notification from './components/notification'
+import FlashMessage from 'react-native-flash-message'
 
 
 class Comments extends Component {
@@ -265,6 +267,8 @@ class Comments extends Component {
           )}
         </View>
 
+        <Notification />
+
         <Tabbar 
           {...this.props}
           active = {''}
@@ -341,7 +345,7 @@ class Comments extends Component {
             به زودی پشتیبانی چیلیوری بررسی خواهد کرد.
           </Text>       
         </Modal>
-
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }
