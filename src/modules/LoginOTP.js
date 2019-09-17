@@ -113,7 +113,7 @@ class LoginOTP extends Component {
     })
   }
 
-  showModal = state => { this.setState({ showModal: state }) }
+  showModal = state => { this.setState({ showModal: state, otp: state === true ? null : this.state.otp }) } // otp will always be null at modal show
 
   render() {
     return (
