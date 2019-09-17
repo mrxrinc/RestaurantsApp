@@ -273,7 +273,7 @@ class API { //exported to use in loginOTP page
             dispatch(action.loadingEnd())
             this.showNotification({
               title: 'خطا!',
-              message: `${resp.data.message_fa}! yo from login`,
+              message: `${resp.data.message_fa}!`,
               type: 'error'
             }, dispatch)
           }
@@ -334,22 +334,33 @@ class API { //exported to use in loginOTP page
             dispatch(action.loadingEnd())
             this.showNotification({
               title: 'خطا!',
-              message: `${resp.data.message_fa}!yo inside services`,
+              message: `${resp.data.message_fa}!`,
               type: 'error'
             }, dispatch)
           }
           return resp.data
         })
         .catch(err => {
-          console.log('OTP REQUEST ERROR ===> ', err)
           dispatch(action.loadingEnd())
-          util.handleOffline(props, true)
-          this.showNotification({
-            title: 'خطا!',
-            message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
-            type: 'error'
-          }, dispatch)
-          return err
+          console.log('OTP REQUEST ERROR ===> ', err.response)
+          if(err.response.status === 400) {
+            setTimeout(() => { // we need this coz the modal of verifyOTP need to compeletely be closed before this modal been shown!
+              this.showNotification({
+                title: 'خطا!',
+                message: err.response.data.message_fa,
+                type: 'error'
+              }, dispatch)
+            }, 1500)
+          } else {
+            util.handleOffline(props, true)
+            setTimeout(() => { // for the same reson as up!
+              this.showNotification({
+                title: 'خطا!',
+                message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
+                type: 'error'
+              }, dispatch)
+            }, 1500)
+          }
         })
       }
     }
@@ -390,35 +401,43 @@ class API { //exported to use in loginOTP page
   forgetPassword = (props, username) => {
     const { dispatch } = props
     dispatch(action.loadingIIStart())
-    axios({
-      method: 'post',
-      url: 'user/forgotPassword',
-      data: {
-        identification: username
-      }
-    })
-    .then(resp => {
-      console.log('FORGET_PASSWORD STATUS TRUE ', resp.data)
-      if(resp.data.status) {
+    if(username.trim().length === 0) {
+      dispatch(action.loadingEnd())
+      this.showNotification({
+        title: 'خطا!',
+        message: 'لطفا ایمیل یا شماره موبایل خود را وارد کنید!',
+        type: 'alarm'
+      }, dispatch)
+    } else {
+      axios({
+        method: 'post',
+        url: 'user/forgotPassword',
+        data: {
+          identification: username
+        }
+      })
+      .then(resp => {
+        console.log('FORGET_PASSWORD STATUS TRUE ', resp.data)
+        if(resp.data.status) {
+          dispatch(action.loadingIIEnd())
+          dispatch(action.forgetPassword(resp.data.result.type))
+        } else {
+          console.log('FORGET_PASSWORD STATUS FALSE ', resp.data)
+          dispatch(action.loadingIIEnd())
+          this.showNotification({
+            title: 'خطا!',
+            message: resp.data.message_fa,
+            type: 'error'
+          }, dispatch)
+        }
+      })
+      .catch(err => {
+        console.log('FORGET_PASSWORD REQUEST ERROR ', err.response)
         dispatch(action.loadingIIEnd())
-        dispatch(action.forgetPassword(resp.data.result.type))
-      } else {
-        console.log('FORGET_PASSWORD STATUS FALSE ', resp.data)
-        dispatch(action.loadingIIEnd())
-        this.showPush({
-          message: typeof resp.data.message_fa === 'string' ? 
-                    `${resp.data.message_fa}!` : 
-                    resp.data.message_fa[0].identification[0],
-          status: 'danger'
-        })
-      }
-    })
-    .catch(err => {
-      console.log('FORGET_PASSWORD REQUEST ERROR ', err)
-      dispatch(action.loadingIIEnd())
-      util.handleOffline(props, true)
-      util.toErrorPage(1031, props.navigator)
-    })
+        util.handleOffline(props, true)
+        util.toErrorPage(1031, props.navigator)
+      })
+    }
   }
 
   resetForgetPasswordValue = dispatch => {
@@ -436,9 +455,9 @@ class API { //exported to use in loginOTP page
   showPush = option => {
     option = option || {}
     showMessage({
-      message: option.message ? option.message : '  یک متن تست برای نوتیفیکیشن',
+      message: option.message ? option.message : '!',
       type: option.status ? option.status : "default",
-      duration: option.timer || 1850,
+      duration: option.timer ? option.timer * 1000 : 1850,
       floating: true
     })
   }
