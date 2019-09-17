@@ -55,7 +55,7 @@ class LoginOTP extends Component {
       } else {
         axios({
           method: 'post',
-          url: api.OTP_URL + 'otp/request',
+          url: api.URL + 'otp/request',
           data: {
             recipient,
             channel,

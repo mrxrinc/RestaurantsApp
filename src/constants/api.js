@@ -1,6 +1,6 @@
 // APP wide Constants
 
-export const DEBUG = true
+export const DEBUG = false
 export const Version = 2
 // export const ContentType = 'application/json;charset=UTF-8'
 
@@ -8,7 +8,7 @@ export const URL = DEBUG ?
   'https://chilivery.net/restaurant-mobile-api/v2/' : // DEVELOPMENT
   'https://chilivery.com/restaurant-mobile-api/v2/' // PRODUCTION
 
-export const OTP_URL = DEBUG ?
+export const OTP_URL = DEBUG ? // just for development, now its useless
   'https://chilivery.net/mobile-api/v2/' :
   'https://chilivery.com/mobile-api/v2/'
 
