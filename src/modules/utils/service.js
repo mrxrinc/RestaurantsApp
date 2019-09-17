@@ -308,7 +308,7 @@ class API { //exported to use in loginOTP page
       } else {
         axios({
           method: 'post',
-          url: api.OTP_URL + 'otp/verify',
+          url: api.URL + 'otp/verify',
           data: {
             recipient,
             otp,
