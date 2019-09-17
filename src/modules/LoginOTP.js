@@ -79,20 +79,29 @@ class LoginOTP extends Component {
             dispatch(action.loadingEnd())
             this.showNotification({
               title: 'خطا!',
-              message: `${resp.data.message_fa}!yo in LoginOTP page`,
+              message: `${resp.data.message_fa}!`,
               type: 'error'
             }, dispatch)
           }
         })
         .catch(err => {
           console.log('OTP REQUEST ERROR ===> ', err)
+          console.log('OTP REQUEST ERROR OBJECT ===> ', err.response)
           dispatch(action.loadingEnd())
-          util.handleOffline(this.props, true)
-          this.showNotification({
-            title: 'خطا!',
-            message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
-            type: 'error'
-          }, dispatch)
+          if(err.response.data.status === false) {
+            this.showNotification({
+              title: 'خطا!',
+              message: err.response.data.message_fa,
+              type: 'error'
+            }, dispatch)
+          } else {
+            util.handleOffline(this.props, true)
+            this.showNotification({
+              title: 'خطا!',
+              message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
+              type: 'error'
+            }, dispatch)
+          }
         })
       }
     }
@@ -273,7 +282,7 @@ class LoginOTP extends Component {
         </Modal>
         
         <Notification />
-        <FlashMessage position="top" />
+        {/* <FlashMessage position="top" /> */}
       </View>
     )
   }
