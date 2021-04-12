@@ -27,10 +27,10 @@ class More extends Component {
       showContactModal: false,
       showLogoutModal: false,
       phoneNumberMenu: '02142091404',
-      phoneNumberDeliveryZones: '02142091408',
+      phoneNumberDeliveryZones: '02142091403',
       phoneNumberTrade: '02142091409',
       phoneNumberComments: '02142091410',
-      phoneNumberMotochili: '02142091470',
+      phoneNumberMotochili: '02141096470',
       link: 'https://t.me/chilivery_menu'
     }
     // Crashlytics.setUserName(this.props.state.user.result.session.user.fullName)

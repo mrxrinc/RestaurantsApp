@@ -97,7 +97,8 @@ export const financialReport = (state = initialState.financialReport, { type, pa
   if(type === TYPE.LOAD_FINANCIAL_REPORT) return payload
   else if(type === TYPE.LOAD_FINANCIAL_REPORT_ADDING && payload) { //after last page if u press 'more' we would get null on data causing error! so we preventing
     const newReports = [...state.result.data, ...payload]
-    const newResult = { ...state.result, orders: newReports }
+    const newResult = { ...state.result, data: newReports }
+    console.log('from reducer===', newReports)
     return { ...state, result: newResult }
   }
   return state
@@ -107,7 +108,7 @@ export const financialOrders = (state = initialState.financialOrders, { type, pa
   if(type === TYPE.LOAD_FINANCIAL_ORDERS) return payload
   else if(type === TYPE.LOAD_FINANCIAL_ORDERS_ADDING && payload) { //after last page if u press 'more' we would get null on data causing error! so we preventing
     const newOrders = [...state.result.data, ...payload]
-    const newResult = { ...state.result, orders: newOrders }
+    const newResult = { ...state.result, data: newOrders }
     return { ...state, result: newResult }
   }
   return state
@@ -122,7 +123,7 @@ export const financialAmendments = (state = initialState.financialAmendments, { 
   if(type === TYPE.LOAD_FINANCIAL_AMENDMENTS) return payload
   else if(type === TYPE.LOAD_FINANCIAL_AMENDMENTS_ADDING && payload) { //after last page if u press 'more' we would get null on data causing error! so we preventing
     const newAmendments = [...state.result.data, ...payload]
-    const newResult = { ...state.result, orders: newAmendments }
+    const newResult = { ...state.result, data: newAmendments }
     return { ...state, result: newResult }
   }
   return state

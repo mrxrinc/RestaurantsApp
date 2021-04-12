@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, ScrollView, TextInput, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native'
+import { View, ScrollView, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 import * as Anim from 'react-native-animatable'
@@ -10,14 +10,13 @@ import IOS from './assets/platform'
 import Image from './components/image'
 import ModalView from './components/modalView'
 import { Text, Icon } from './components/font'
-import Button, { ButtonLight } from './components/button'
+import Button from './components/button'
 import Header from './components/header'
 import Navbar from './components/navbar'
 import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import { navigatorStyle } from './assets'
-import * as util from './utils'
 import API from './utils/service'
 import Loading from './components/loading'
 import ListFooter from './components/listFooter'
@@ -56,7 +55,6 @@ class FinancialReport extends Component {
   }
 
   loadMore = () => {
-    this.fetchData(true) // this adds items to current list
     API.financialReport(this.props, true) // second arg is for pagination
   }
 
@@ -67,11 +65,18 @@ class FinancialReport extends Component {
       passProps: { invoiceId },
       options: { animations: { push: { enabled: false, waitForRender: true } } } 
       } 
-  })
+    })
   }
 
   render() {
     const data = this.props.state.financialReport ? this.props.state.financialReport.result : null
+    const showMore = data && data.pagination.total !== data.data.length ? () => (
+      <ListFooter 
+        items={data.data} 
+        loading={this.props.state.loading}
+        onPress={this.loadMore} 
+      />
+    ) : null
     return (
       <KeyboardAvoidingView style={[r.full, g.bgPrimary]} behavior='padding'>
         <Navbar
@@ -151,13 +156,7 @@ class FinancialReport extends Component {
                   <FlatList 
                     data={data.data} // second 'data' is from api. first one is my variable for redux financialReport data
                     keyExtractor={item => item.id}
-                    ListFooterComponent={() => (
-                      <ListFooter 
-                        items={data.data} 
-                        loading={this.props.state.loading}
-                        onPress={this.loadMore} 
-                      />
-                    )}
+                    ListFooterComponent={showMore}
                     renderItem={({ item }) => (
                       <OrderItem
                         {...item}
@@ -387,6 +386,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(FinancialReport)
 
 const OrderItem = props => (
   <Anim.View
+    key={props.id}
     style={[r.wFull, r.shadow5, r.bottomM40, r.overhide]}
     animation={'fadeInUp'}
     duration={150}

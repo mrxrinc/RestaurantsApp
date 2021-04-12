@@ -125,8 +125,8 @@ class FinancialReportDetail extends Component {
               <ScrollableTabView
                 renderTabBar={() => (
                   <ScrollableTabBar 
-                    orders={(ordersData.data && ordersData.data.length > 0) ? ordersData.data.length : 0}
-                    amendments={(amendmentsData.data && amendmentsData.data.length > 0) ? amendmentsData.data.length : 0}
+                    orders={ordersData.data ? ordersData.pagination.total : 0}
+                    amendments={amendmentsData.data ? amendmentsData.pagination.total : 0}
                   />
                 )}
                 initialPage={1}

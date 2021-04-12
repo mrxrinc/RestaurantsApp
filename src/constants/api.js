@@ -8,10 +8,6 @@ export const URL = DEBUG ?
   'https://chilivery.net/restaurant-mobile-api/v2/' : // DEVELOPMENT
   'https://chilivery.com/restaurant-mobile-api/v2/' // PRODUCTION
 
-export const OTP_URL = DEBUG ? // just for development, now its useless
-  'https://chilivery.net/mobile-api/v2/' :
-  'https://chilivery.com/mobile-api/v2/'
-
 export const Auth = DEBUG ? 
   'Basic Y2hpbGlkZXY6d2VsY29tZXRvY2hpbGlkZXY=' : // DEVELOPMENT
   null // PRODUCTION
