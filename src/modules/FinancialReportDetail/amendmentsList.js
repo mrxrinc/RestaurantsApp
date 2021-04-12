@@ -1,14 +1,12 @@
 
 import React, { Component } from 'react'
-import { View, FlatList, RefreshControl } from 'react-native'
+import { View, FlatList } from 'react-native'
 import { connect } from 'react-redux'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
-import { IOS } from '../assets'
-import { Text, Icon } from '../components/font'
+import { Text } from '../components/font'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
-import * as asset from '../assets'
 import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
@@ -21,40 +19,39 @@ class AmendmentsList extends Component {
 
   render() {
     const amendmentsData = this.props.state.financialAmendments ? this.props.state.financialAmendments.result : null
+    const showMore = amendmentsData && amendmentsData.pagination.total !== amendmentsData.data.length ? () => (
+      <ListFooter 
+        items={amendmentsData.data} 
+        loading={this.props.state.loading}
+        onPress={this.loadMore} 
+      />
+    ) : null
     return (
       <View style={[r.full, g.bgPrimary]} >
-          {this.props.state.loading && !this.props.state.salesReport && <Loading />}
-          {amendmentsData && (
-            <View
-              style={[r.full]}
-              animation={'fadeIn'}
-              duration={300}
-              delay={0}
-              useNativeDriver
-            >
-
-                <FlatList 
-                    data={amendmentsData.data}
-                    style={[r.padd15]}
-                    keyExtractor={item => item.id}
-                    ListFooterComponent={() => (
-                        <ListFooter 
-                        items={amendmentsData.data} 
-                        loading={this.props.state.loading}
-                        onPress={this.loadMore} 
-                        />
-                    )}
-                    renderItem={({ item }) => (
-                        <AmendmentItem
-                            id={item.id}
-                            reason={item.reason}
-                            date={item.createdAt}
-                            price={item.amount}
-                        />
-                    )}
+        {this.props.state.loading && !this.props.state.salesReport && <Loading />}
+        {amendmentsData && (
+          <View
+            style={[r.full]}
+            animation={'fadeIn'}
+            duration={300}
+            delay={0}
+            useNativeDriver
+          >
+            <FlatList 
+              data={amendmentsData.data}
+              style={[r.padd15]}
+              keyExtractor={item => item.id}
+              ListFooterComponent={showMore}
+              renderItem={({ item }) => (
+                <AmendmentItem
+                  reason={item.reason}
+                  date={item.createdAt}
+                  price={item.amount}
                 />
-            </View>
-          )}
+              )}
+            />
+          </View>
+        )}
       </View>
     )
   }
@@ -66,7 +63,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(AmendmentsList)
 
 
 const AmendmentItem = props => (
-    <Anim.View
+  <Anim.View
+    key={props.id}
     style={[r.wFull, r.shadow5, r.bottomM20, r.overhide]}
     animation={'fadeInUp'}
     duration={150}

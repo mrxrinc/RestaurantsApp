@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native'
-import IOS from '../assets/platform'
-import { window } from '../assets'
+
 
 module.exports = StyleSheet.create({
   primary: { color: '#32434C' },

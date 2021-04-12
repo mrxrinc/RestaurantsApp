@@ -1,17 +1,15 @@
 
 import React, { Component } from 'react'
-import { View, FlatList, ScrollView, RefreshControl } from 'react-native'
+import { View, FlatList, ScrollView } from 'react-native'
 import { connect } from 'react-redux'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
 import Modal from 'react-native-modal'
 import ModalView from '../components/modalView'
-import { IOS } from '../assets'
 import { Text, Icon } from '../components/font'
-import Button, { ButtonLight } from '../components/button'
+import { ButtonLight } from '../components/button'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
-import * as asset from '../assets'
 import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
@@ -37,9 +35,16 @@ class OrdersList extends Component {
   render() {
     const ordersData = this.props.state.financialOrders ? this.props.state.financialOrders.result : null
     const modalData = this.props.state.financialOrderDetail ? this.props.state.financialOrderDetail.result : null
+    const showMore = ordersData && ordersData.pagination.total !== ordersData.data.length ? () => (
+      <ListFooter 
+        items={ordersData.data} 
+        loading={this.props.state.loading}
+        onPress={this.loadMore} 
+      />
+    ) : null
     return (
       <View style={[r.full, g.bgPrimary]} >
-          {this.props.state.loading && !this.props.state.salesReport && <Loading />}
+          {this.props.state.loading && !ordersData && <Loading />}
           {ordersData && (
             <View
               style={[r.full]}
@@ -48,28 +53,20 @@ class OrdersList extends Component {
               delay={0}
               useNativeDriver
             >
-
-                <FlatList 
-                    data={ordersData.data}
-                    style={[r.padd15]}
-                    keyExtractor={item => item.id}
-                    ListFooterComponent={() => (
-                        <ListFooter 
-                            items={ordersData.data} 
-                            loading={this.props.state.loading}
-                            onPress={this.loadMore} 
-                        />
-                    )}
-                    renderItem={({ item }) => (
-                        <OrderItem
-                            id={item.id}
-                            date={item.orderPaidAt}
-                            price={item.totalPrice}
-                            onPress={() => this.showModal(true, item.id)}
-                        />
-                    )}
-                />
-
+              <FlatList 
+                data={ordersData.data}
+                style={[r.padd15]}
+                keyExtractor={item => item.id}
+                ListFooterComponent={showMore}
+                renderItem={({ item }) => (
+                  <OrderItem
+                    id={item.id}
+                    date={item.orderPaidAt}
+                    price={item.totalPrice}
+                    onPress={() => this.showModal(true, item.id)}
+                  />
+                )}
+              />
             </View>
           )}
 
@@ -143,10 +140,9 @@ class OrdersList extends Component {
 
                   <View style={[r.bgLight4, r.round10, r.margin10, r.marginV20]}> 
                     {modalData.items.map((item, index) => (
-                      <>
+                      <View key={index}>
                         <OrderDetailRow 
                           {...item}
-                          key={index}
                           items
                           doubleLine
                           hasSideDish={item.options.length > 0 ? true : false}
@@ -191,7 +187,7 @@ class OrdersList extends Component {
                             />
                           </View>
                         ))}
-                      </>
+                      </View>
                     ))}
                     <OrderDetailRow 
                       bold
@@ -324,6 +320,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)
 
 const OrderItem = props => (
   <Anim.View
+    key={props.id}
     style={[r.wFull, r.shadow5, r.bottomM20, r.overhide]}
     animation={'fadeInUp'}
     duration={150}

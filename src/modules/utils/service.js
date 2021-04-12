@@ -322,13 +322,25 @@ class API { //exported to use in loginOTP page
         })
         .then(resp => {
           if(resp.data.status) {
-            console.log('OTP REQUEST STATUS TRUE ===> ', resp.data)
+            console.log('OTP VERIFY STATUS TRUE ===> ', resp.data)
             dispatch(action.loadingEnd())
-            dispatch(action.storeUser(resp.data))
-            this.localDB.setData(resp.data.result.session.token)
-            axios.defaults.headers.common['token'] = resp.data.result.session.token
-            Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard' } }])
-            console.log('TOKEN SAVED TO LOCAL') 
+            if(resp.data.result.isRegistered) {
+              dispatch(action.storeUser(resp.data))
+              this.localDB.setData(resp.data.result.session.token)
+              axios.defaults.headers.common['token'] = resp.data.result.session.token
+              Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard' } }])
+              console.log('TOKEN SAVED TO LOCAL') 
+            } else {
+              console.log('OTP VERIFY ISREGISTERED FALSE ===> ', resp.data)
+              dispatch(action.loadingEnd())
+              setTimeout(() => { // we need this coz the modal of verifyOTP need to compeletely be closed before this modal been shown!
+                this.showNotification({
+                  title: 'خطا!',
+                  message: 'این کاربر ثبت نشده است!',
+                  type: 'error'
+                }, dispatch)
+              }, 1500)
+            }
           } else {
             console.log('OTP REQUEST STATUS FALSE ===> ', resp)
             dispatch(action.loadingEnd())
@@ -491,13 +503,15 @@ class API { //exported to use in loginOTP page
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
           if(err.response.data.status === false) {
-            Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
-            this.showPush({
-              message: 'این کاربر دسترسی به پنل ندارد!',
-              status: 'danger',
-              timer: 3
-            })
             this.localDB.clearData()
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
+            setTimeout(() => { // we need this coz the modal of verifyOTP need to compeletely be closed before this modal been shown!
+              this.showNotification({
+                title: 'خطا!',
+                message: 'این کاربر دسترسی به پنل ندارد!',
+                type: 'error'
+              }, dispatch)
+            }, 1500)
           } else {
             util.toErrorPage(1013, props.navigator)
           }
@@ -623,14 +637,14 @@ class API { //exported to use in loginOTP page
   financialReport = (props, paginate = false) => {
     const { dispatch } = props
     let page = props.state.financialReport && props.state.financialReport.result.data ? 
-      Math.ceil(props.state.financialReport.result.data.length / 20) : 1
+      Math.ceil(props.state.financialReport.result.data.length / 10) : 1
     page = page === 0 ? 1 : page // avoiding zero division 
     page = paginate ? page + 1 : 1 // no pagination means all the first data nedded
     dispatch(action.loadingStart())
     dispatch(action.hideEmpty({}))
     const params = {
       restaurantId: props.state.currentRestaurant,
-      page: 1
+      page
     }
     axios({
       method: 'get',
@@ -638,11 +652,11 @@ class API { //exported to use in loginOTP page
       params 
     })
     .then( resp => {
-      console.log('FINANCIAL_REPORT STATUS TRUE ', resp.data)
+      console.log('FINANCIAL_REPORT STATUS TRUE ', resp.data.result.data)
       if(resp.data.status) {
         dispatch(action.loadingEnd())
         if(page === 1) dispatch(action.loadFinancialReport(resp.data))
-        else dispatch(action.loadFinancialReportAdding(resp.data.result.data))
+        else dispatch(action.loadFinancialReportAdding(resp.data.result.data)); console.log('adding======', resp.data.result.data)
         if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
       } else {
         console.log('FINANCIAL_REPORT STATUS FALSE ', resp.data)
@@ -661,7 +675,7 @@ class API { //exported to use in loginOTP page
   financialOrders = (props, invoiceId, paginate = false) => {
     const { dispatch } = props
     let page = props.state.financialOrders && props.state.financialOrders.result.data ? 
-      Math.ceil(props.state.financialOrders.result.data.length / 20) : 1
+      Math.ceil(props.state.financialOrders.result.data.length / 10) : 1
       console.log('FINANCIAL_ORDERS PAGE NUMBER ', page)
     page = page === 0 ? 1 : page // avoiding zero division 
     page = paginate ? page + 1 : 1 // no pagination means all the first data needed
@@ -669,7 +683,7 @@ class API { //exported to use in loginOTP page
     dispatch(action.hideEmpty({}))
     const params = {
       invoiceId,
-      page: 1
+      page
     }
     axios({
       method: 'get',
@@ -729,7 +743,7 @@ class API { //exported to use in loginOTP page
   financialAmendments = (props, invoiceId, paginate = false) => {
     const { dispatch } = props
     let page = props.state.financialAmendments && props.state.financialAmendments.result.data ? 
-      Math.ceil(props.state.financialAmendments.result.data.length / 20) : 1
+      Math.ceil(props.state.financialAmendments.result.data.length / 10) : 1
       console.log('FINANCIAL_AMENDMENTS PAGE NUMBER ', page)
     page = page === 0 ? 1 : page // avoiding zero division 
     page = paginate ? page + 1 : 1 // no pagination means all the first data needed
@@ -737,7 +751,7 @@ class API { //exported to use in loginOTP page
     dispatch(action.hideEmpty({}))
     const params = {
       invoiceId,
-      page: 1
+      page
     }
     axios({
       method: 'get',
