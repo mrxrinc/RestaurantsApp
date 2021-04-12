@@ -1,76 +1,51 @@
 
 import React, { Component } from 'react'
-import { View, FlatList, RefreshControl } from 'react-native'
+import { View, FlatList, ScrollView } from 'react-native'
 import { connect } from 'react-redux'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
 import Modal from 'react-native-modal'
 import ModalView from '../components/modalView'
-import IOS from '../assets/platform'
 import { Text, Icon } from '../components/font'
-import Button, { ButtonLight } from '../components/button'
+import { ButtonLight } from '../components/button'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
-import * as asset from '../assets'
 import API from '../utils/service'
 import Loading from '../components/loading'
 import ListFooter from '../components/listFooter'
 
 class OrdersList extends Component {
-  static navigatorStyle = asset.navigatorStyle
 
   constructor(props) {
     super(props)
     this.state = {
-        data: [
-            {
-              id: 'CHL-INV-4723PK',
-              orderCount: 8,
-              orderCorrectionCount: 2,
-              orderTotalPrices: 250100,
-              orderCorrectionTotalPrices: -30000,
-              price: 220100,
-              createdAt: '1398/05/01',
-              period: '(1398/04/01 تا 1398/04/31)',
-              status: 'در انتظار پرداخت'
-            },
-            {
-              id: 'CHL-INV-51R34P',
-              orderCount: 10,
-              orderCorrectionCount: 1,
-              orderTotalPrices: 275200,
-              orderCorrectionTotalPrices: 5000,
-              price: 280200,
-              createdAt: '1398/04/01',
-              period: '(1398/03/01 تا 1398/03/31)',
-              status: 'پرداخت شده'
-            }
-        ],
+        showModal: false
     }
   }
 
-  componentDidMount() {
-    // this.fetchData()
-  }
-
-  fetchData = paginate => {
-    if(paginate == null) paginate = false
-    console.log('PAGE NUMBER 00', paginate)
-    API.salesReport(this.props, paginate, this.state.dateFrom, this.state.dateTo, this.state.period, this.state.orderId)
-  }
-
   loadMore = () => {
-    this.fetchData(true) // this adds items to current list
-    // API.salesReport(this.props, true, this.state.dateFrom, this.state.dateTo, this.state.period) // second arg is for pagination
+    API.financialOrders(this.props, this.props.invoiceId, true) // third arg is for pagination
   }
 
-  showModal = state => { this.setState({ showModal: state }) }
+  showModal = (state, orderId) => { 
+    this.setState({ showModal: state })
+    if(state) API.financialOrderDetail(this.props, orderId)
+  }
 
   render() {
+    const ordersData = this.props.state.financialOrders ? this.props.state.financialOrders.result : null
+    const modalData = this.props.state.financialOrderDetail ? this.props.state.financialOrderDetail.result : null
+    const showMore = ordersData && ordersData.pagination.total !== ordersData.data.length ? () => (
+      <ListFooter 
+        items={ordersData.data} 
+        loading={this.props.state.loading}
+        onPress={this.loadMore} 
+      />
+    ) : null
     return (
       <View style={[r.full, g.bgPrimary]} >
-          {this.props.state.loading && !this.props.state.salesReport && <Loading />}
-          {this.state.data && (
+          {this.props.state.loading && !ordersData && <Loading />}
+          {ordersData && (
             <View
               style={[r.full]}
               animation={'fadeIn'}
@@ -78,28 +53,20 @@ class OrdersList extends Component {
               delay={0}
               useNativeDriver
             >
-
-                <FlatList 
-                    data={this.state.data}
-                    style={[r.padd15]}
-                    keyExtractor={item => item.id}
-                    ListFooterComponent={() => (
-                        <ListFooter 
-                            items={this.state.data.invoices} 
-                            loading={this.props.state.loading}
-                            onPress={this.loadMore} 
-                        />
-                    )}
-                    renderItem={({ item }) => (
-                        <OrderItem
-                            id={'CHL-AX7974YY'}
-                            date={'1398/2/10 - 10:13'}
-                            price={'55690'}
-                            onPress={() => this.showModal(true)}
-                        />
-                    )}
-                />
-
+              <FlatList 
+                data={ordersData.data}
+                style={[r.padd15]}
+                keyExtractor={item => item.id}
+                ListFooterComponent={showMore}
+                renderItem={({ item }) => (
+                  <OrderItem
+                    id={item.id}
+                    date={item.orderPaidAt}
+                    price={item.totalPrice}
+                    onPress={() => this.showModal(true, item.id)}
+                  />
+                )}
+              />
             </View>
           )}
 
@@ -131,7 +98,7 @@ class OrdersList extends Component {
             </View>
             
             {this.props.state.loading && <Loading color={'#A6BCC7'} />}
-            {this.props.state.order && (
+            {modalData && (
               <Anim.View
                 style={[r.full]}
                 animation={'fadeIn'}
@@ -142,106 +109,194 @@ class OrdersList extends Component {
                 <ScrollView showsVerticalScrollIndicator={false}>
                   <OrderDetailRow 
                     right={'شماره فاکتور'}
-                    left={this.props.state.order.result.detail.orderId}
-                  />
-                  <OrderDetailRow 
-                    right={'تاریخ و زمان سفارش'}
-                    left={this.props.state.order.result.detail.orderPaidAt}
+                    left={modalData.orderId}
                   />
                   <OrderDetailRow 
                     right={'نام مشتری'}
-                    left={this.props.state.order.result.detail.userName}
+                    left={modalData.userName}
+                  />
+                  <OrderDetailRow 
+                    right={'وضعیت سفارش'}
+                    left={modalData.orderStatus}
+                  />
+                  <OrderDetailRow 
+                    right={'تاریخ و زمان سفارش'}
+                    left={modalData.orderPaidAt}
                   />
                   <OrderDetailRow 
                     right={'شماره همراه مشتری'}
-                    left={this.props.state.order.result.detail.userPhone}
+                    left={modalData.userPhone}
                   />
                   <OrderDetailRow 
                     right={'آدرس مشتری'}
-                    left={this.props.state.order.result.detail.userAddress}
+                    left={modalData.userAddress}
                     multiline={20}
                   />
                   <OrderDetailRow 
                     right={'توضیحات کاربر'}
-                    left={this.props.state.order.result.detail.orderDescription}
+                    left={modalData.orderDescription}
                     multiline={20}
                   />
 
                   <View style={[r.bgLight4, r.round10, r.margin10, r.marginV20]}> 
-                    {this.props.state.order.result.food.map((item, index) => (
-                      <OrderDetailRow 
-                        key={index}
-                        items
-                        right={item.foodName}
-                        left={(
-                          <>
-                            <PriceText>{item.orderItemCount}</PriceText>
-                            <PriceText> x </PriceText>
-                            <PriceText> تومان </PriceText>
-                            <PriceText>{numeral(item.orderItemPrice).format('0,0')}</PriceText>
-                            <PriceText> = </PriceText>
-                            <PriceText> تومان </PriceText>
-                            <PriceText>{numeral(item.orderItemCount * item.orderItemPrice).format('0,0')}</PriceText>
-                          </>
-                        )}
-                      />
+                    {modalData.items.map((item, index) => (
+                      <View key={index}>
+                        <OrderDetailRow 
+                          {...item}
+                          items
+                          doubleLine
+                          hasSideDish={item.options.length > 0 ? true : false}
+                          bold
+                          right={item.foodName}
+                          left={(
+                            <>
+                              {item.orderItemCount > 1 && (
+                                <>
+                                  <PriceText>{item.orderItemCount}</PriceText>
+                                  <PriceText> x </PriceText>
+                                  <PriceText> تومان </PriceText>
+                                  <PriceText>{numeral(item.orderItemPrice).format('0,0')}</PriceText>
+                                  <PriceText> = </PriceText>
+                                </>
+                              )}
+                              <PriceText> تومان </PriceText>
+                              <PriceText>{numeral(item.orderItemCount * item.orderItemPrice).format('0,0')}</PriceText>
+                            </>
+                          )}
+                        />
+                        {item.options && item.options.length > 0 && item.options.map((option, index) => (
+                          <View style={[r.rightP30]} key={index}>
+                            <OrderDetailRow
+                              items
+                              sideDish
+                              right={
+                                (item.orderItemCount > 1 && option.totalOptionPrice > 0) ? 
+                                `${option.foodOptionName}  ( ${item.orderItemCount} )` 
+                                : option.foodOptionName
+                              }
+                              left={
+                                (item.orderItemCount > 1 && option.totalOptionPrice > 0 )? (
+                                  <>
+                                    <PriceText> تومان </PriceText>
+                                    <PriceText>{numeral(option.totalOptionPrice).format('0,0')}</PriceText>
+                                  </>
+                                ) : (
+                                  <PriceText style={r.grayLight}> رایگان </PriceText>
+                                )
+                              }
+                            />
+                          </View>
+                        ))}
+                      </View>
                     ))}
                     <OrderDetailRow 
                       bold
                       items
-                      right={`مجموع (${this.props.state.order.result.detail.orderItemCount} عدد) `}
+                      right={'مجموع قیمت اصلی غذاها'}
                       left={(
                         <>
                           <PriceText bold> تومان </PriceText>
-                          <PriceText bold>{numeral(this.props.state.order.result.detail.totalPriceWithRes).format('0,0')}</PriceText>
+                          <PriceText bold>{numeral(modalData.totalMainOrderItemPrices).format('0,0')}</PriceText>
+                        </>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      bold
+                      items
+                      right={'مجموع قیمت غذاها با تخفیف'}
+                      left={(
+                        <>
+                          <PriceText bold> تومان </PriceText>
+                          <PriceText bold>{numeral(modalData.totalOrderItemPrices).format('0,0')}</PriceText>
+                        </>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      items
+                      right={`مالیات بر ارزش افزوده (${modalData.vatPercent}%) `}
+                      left={(
+                        <>
+                          {modalData.orderVat != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.orderVat).format('0,0')}</PriceText>
                         </>
                       )}
                     />
                     <OrderDetailRow 
                       items
                       right={'هزینه بسته بندی'}
-                      left={(
-                        <>
-                          {this.props.state.order.result.detail.packagingPrice != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(this.props.state.order.result.detail.packagingPrice).format('0,0')}</PriceText>
-                        </>
-                      )}
-                    />
-                    <OrderDetailRow 
-                      items
-                      right={`مالیات بر ارزش افزوده (${this.props.state.order.result.detail.contractFoodVat}%) `}
-                      left={(
-                        <>
-                          {this.props.state.order.result.detail.allVat != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(this.props.state.order.result.detail.allVat).format('0,0')}</PriceText>
-                        </>
-                      )}
+                      left={modalData.packagingPrice != 0 ? (
+                          <>
+                            <PriceText> تومان </PriceText>
+                            <PriceText>{numeral(modalData.packagingPrice).format('0,0')}</PriceText>
+                          </>
+                        ) : (
+                          <PriceText> رایگان </PriceText>
+                        )
+                      }
                     />
                     <OrderDetailRow 
                       items
                       right={'تخفیف رستوران'}
-                      left={(
-                        <PriceText>%{this.props.state.order.result.detail.restaurantShareDiscountPercent}</PriceText>
+                      left={modalData.restaurantDiscount != 0 ? (
+                        <>
+                          <PriceText> تومان </PriceText>
+                          <PriceText>{numeral(modalData.restaurantDiscount).format('0,0')}</PriceText>
+                        </>
+                      ) : (
+                        <PriceText> بدون تخفیف </PriceText>
                       )}
                     />
                     <OrderDetailRow 
                       items
-                      right={'هزینه ارسال'}
+                      right={'مبلغ پیک رستوران'}
+                      left={modalData.deliveryPrice != 0 ? (
+                        <>
+                          <PriceText> تومان </PriceText>
+                          <PriceText>{numeral(modalData.deliveryPrice).format('0,0')}</PriceText>
+                        </>
+                      ) : (
+                        <PriceText> رایگان </PriceText>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      bold
+                      items
+                      right={'پرداختی مشتری'}
                       left={(
                         <>
-                          {this.props.state.order.result.detail.deliveryPrice != 0 && <PriceText> تومان </PriceText>}
-                          <PriceText>{numeral(this.props.state.order.result.detail.deliveryPrice).format('0,0')}</PriceText>
+                          <PriceText bold> تومان </PriceText>
+                          <PriceText bold>{numeral(modalData.orderTotalPrice).format('0,0')}</PriceText>
+                        </>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      items
+                      right={'کمیسیون موتوچیلی'}
+                      left={(
+                        <>
+                          {modalData.motochiliCommission != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.motochiliCommission).format('0,0')}</PriceText>
+                        </>
+                      )}
+                    />
+                    <OrderDetailRow 
+                      items
+                      right={'کمیسیون'}
+                      left={(
+                        <>
+                          {modalData.finalCommission != 0 && <PriceText> تومان </PriceText>}
+                          <PriceText>{numeral(modalData.finalCommission).format('0,0')}</PriceText>
                         </>
                       )}
                     />
                     <OrderDetailRow 
                       bold
                       items
-                      right={'پرداختی کاربر'}
+                      right={'پرداختی به رستوران'}
                       left={(
                         <>
                           <PriceText bold> تومان </PriceText>
-                          <PriceText bold>{numeral(this.props.state.order.result.detail.restaurantOrderPriceShow).format('0,0')}</PriceText>
+                          <PriceText bold>{numeral(modalData.orderInvoicePrice).format('0,0')}</PriceText>
                         </>
                       )}
                     />
@@ -265,6 +320,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(OrdersList)
 
 const OrderItem = props => (
   <Anim.View
+    key={props.id}
     style={[r.wFull, r.shadow5, r.bottomM20, r.overhide]}
     animation={'fadeInUp'}
     duration={150}
@@ -302,3 +358,52 @@ const OrderItem = props => (
   </Anim.View>
 )
 
+const OrderDetailRow = props => (
+  <View 
+    style={[
+      r.paddH20, r.paddV5, g.orderDetailRow, 
+      !props.doubleLine && [r.rtl, r.spaceBetween, r.hCenter], 
+      props.items && [r.paddH10, { minHeight: 60 }], 
+      props.sideDish && [r.rightP30, { borderBottomWidth: 0, borderTopWidth: 0,  height: 45 }],
+      !props.sideDish && { paddingTop: 5 }
+    ]}
+  >
+    <View style={[r.leftM30, { flex: 0.8 }]}>
+      <Text 
+        bold={props.bold}
+        size={props.items && !props.doubleLine ? 11 : 14} 
+        height={23} 
+        lineHeight={25} 
+        style={[r.grayDark, r.rtlText, r.rightText]}
+        numberOfLines={1}
+      >
+        {props.right}
+      </Text>
+    </View>
+    <View style={r.full}>
+      {props.items ? (
+        <View style={[r.row, r.leftItems]}>{props.left}</View>
+      ) : (
+        <Text 
+          size={15}
+          height={23} 
+          lineHeight={25} 
+          numberOfLines={props.multiline}
+          style={[
+            r.grayMid, r.leftText, r.ltrText,
+            props.multiline && [r.centerText, r.text12, { lineHeight: 20 }],
+            !props.multiline && [{ height: 20 }]
+          ]}
+        >
+          {props.left}
+        </Text>
+      )}
+    </View>
+  </View>
+)
+
+const PriceText = ({children, bold, style}) => (
+  <Text bold={bold} size={12} style={[r.grayDark, r.rtlText, style]}>
+    {children}
+  </Text>
+)

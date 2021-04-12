@@ -11,7 +11,7 @@ import * as g from './styles/general'
 
 
 class ResetPassword extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
   state={ 
     password: '',
     confirm: ''

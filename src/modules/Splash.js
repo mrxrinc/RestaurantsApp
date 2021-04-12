@@ -8,14 +8,16 @@ import Loading from './components/loading'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
+import Notification from './components/notification'
+import FlashMessage from 'react-native-flash-message'
 
 class Splash extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     // Crashlytics.setString('Screen', 'Splash')
-    // analytics.setCurrentScreen('اسپلش')
+    analytics.setCurrentScreen('اسپلش')
   }
 
   componentDidMount() {
@@ -53,6 +55,9 @@ class Splash extends Component {
             <Loading />
           </View>
         )}
+        
+        <Notification />
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }

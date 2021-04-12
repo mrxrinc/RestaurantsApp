@@ -8,7 +8,6 @@ import numeral from 'numeral'
 import PersianCalendarPicker from 'react-native-persian-calendar-picker'
 import Modal from 'react-native-modal'
 import ScrollableTabView from 'react-native-scrollable-tab-view'
-import IOS from '../assets/platform'
 import Image from '../components/image'
 import ModalView from '../components/modalView'
 import { Text, Icon } from '../components/font'
@@ -19,7 +18,7 @@ import Tabbar from '../components/tabbar'
 import ScrollableTabBar from '../components/scrollableTabbar'
 import * as r from '../styles/rinc'
 import * as g from '../styles/general'
-import * as asset from '../assets'
+import { IOS, navigatorStyle } from '../assets'
 import * as util from '../utils'
 import API from '../utils/service'
 import Loading from '../components/loading'
@@ -32,7 +31,7 @@ import AmendmentsList from './amendmentsList'
 // const ScrollableTabBar = require('../components/scrollableTabbar')
 
 class FinancialReportDetail extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -88,25 +87,22 @@ class FinancialReportDetail extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Financial Report')
+    analytics.setCurrentScreen('جزییات گزارش فروش')
   }
 
   componentDidMount() {
-    // this.fetchData()
+    this.fetchData(this.props.invoiceId)
   }
 
-  fetchData = paginate => {
+  fetchData = (invoiceId, paginate) => {
     if(paginate == null) paginate = false
-    console.log('PAGE NUMBER 00', paginate)
-    API.salesReport(this.props, paginate, this.state.dateFrom, this.state.dateTo, this.state.period, this.state.orderId)
-  }
-
-  loadMore = () => {
-    this.fetchData(true) // this adds items to current list
-    // API.salesReport(this.props, true, this.state.dateFrom, this.state.dateTo, this.state.period) // second arg is for pagination
+    API.financialOrders(this.props, invoiceId, paginate)
+    API.financialAmendments(this.props, invoiceId, paginate)
   }
 
   render() {
-    analytics.setCurrentScreen('جزییات گزارش فروش')
+    const ordersData = this.props.state.financialOrders ? this.props.state.financialOrders.result : null
+    const amendmentsData = this.props.state.financialAmendments ? this.props.state.financialAmendments.result : null
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
@@ -118,7 +114,7 @@ class FinancialReportDetail extends Component {
 
         <View style={r.full}>
           {/* {this.props.state.loading && !this.props.state.salesReport && <Loading />} */}
-          {this.state.data && (
+          {(ordersData && amendmentsData) && (
             <View
               style={r.full}
               animation={'fadeIn'}
@@ -129,16 +125,16 @@ class FinancialReportDetail extends Component {
               <ScrollableTabView
                 renderTabBar={() => (
                   <ScrollableTabBar 
-                    orders={this.state.ordersCount}
-                    amendments={this.state.amendmentsCount}
+                    orders={ordersData.data ? ordersData.pagination.total : 0}
+                    amendments={amendmentsData.data ? amendmentsData.pagination.total : 0}
                   />
                 )}
                 initialPage={1}
                 tabBarActiveTextColor={'#F64559'}
                 tabBarInactiveTextColor={'#697989'}
               >
-                <AmendmentsList tabLabel={'لیست اصلاحیه ها'} />
-                <OrdersList tabLabel={"لیست سفارشات"} />
+                <AmendmentsList tabLabel={'لیست اصلاحیه ها'} invoiceId ={this.props.invoiceId} />
+                <OrdersList tabLabel={"لیست سفارشات"} invoiceId ={this.props.invoiceId} />
               </ScrollableTabView>
 
             </View>

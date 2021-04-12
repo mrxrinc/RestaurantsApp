@@ -10,7 +10,7 @@ export default ListFooter = props => {
   if(props.items) {
     return (
       <View style={[r.center, r.wFull, r.bottomM10, { height: 60 }]}>
-        {(props.items.length >= 20 || props.loading) && (
+        {(props.items.length >= 10 || props.loading) && (
           <ButtonLight
             style={[r.round30, r.center, { width: 80, height: 40 }]}
             onPress={props.onPress}

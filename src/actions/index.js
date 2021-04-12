@@ -70,6 +70,41 @@ export const loadSalesReportAdding = payload => ({
   payload
 })
 
+export const loadFinancialReport = payload => ({
+  type: TYPE.LOAD_FINANCIAL_REPORT,
+  payload
+})
+
+export const loadFinancialReportAdding = payload => ({
+  type: TYPE.LOAD_FINANCIAL_REPORT_ADDING,
+  payload
+})
+
+export const loadFinancialOrders = payload => ({
+  type: TYPE.LOAD_FINANCIAL_ORDERS,
+  payload
+})
+
+export const loadFinancialOrdersAdding = payload => ({
+  type: TYPE.LOAD_FINANCIAL_ORDERS_ADDING,
+  payload
+})
+
+export const loadFinancialOrderDetail = payload => ({
+  type: TYPE.LOAD_FINANCIAL_ORDER_DETAIL,
+  payload
+})
+
+export const loadFinancialAmendments = payload => ({
+  type: TYPE.LOAD_FINANCIAL_AMENDMENTS,
+  payload
+})
+
+export const loadFinancialAmendmentsAdding = payload => ({
+  type: TYPE.LOAD_FINANCIAL_AMENDMENTS_ADDING,
+  payload
+})
+
 export const loadOrder = payload => ({
   type: TYPE.LOAD_ORDER,
   payload

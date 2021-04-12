@@ -6,7 +6,7 @@ import numeral from 'numeral'
 // import { Crashlytics} from 'react-native-fabric'
 import PersianCalendarPicker from 'react-native-persian-calendar-picker'
 import Modal from 'react-native-modal'
-import IOS from './assets/platform'
+import { IOS, navigatorStyle } from './assets'
 import Image from './components/image'
 import ModalView from './components/modalView'
 import { Text, Icon } from './components/font'
@@ -16,18 +16,17 @@ import Navbar from './components/navbar'
 import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-import * as asset from './assets'
 import * as util from './utils'
 import API from './utils/service'
 import Loading from './components/loading'
 import ListFooter from './components/listFooter'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 const LiveIcon = Anim.createAnimatableComponent(Icon)
 
 class SalesReport extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -44,6 +43,7 @@ class SalesReport extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Sales Report')
+    analytics.setCurrentScreen('گزارش فروش')
   }
 
   componentDidMount() {
@@ -101,7 +101,6 @@ class SalesReport extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('گزارش فروش')
     const rangeColorFrom = this.state.dateFrom ? '#fff' : '#acb9c6' // to be active or not!
     const rangeColorTo = this.state.dateTo ? '#fff' : '#acb9c6' // to be active or not!
     return (

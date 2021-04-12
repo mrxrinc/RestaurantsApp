@@ -13,10 +13,11 @@ import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
+import FlashMessage from "react-native-flash-message"
 
 class Dashboard extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -24,6 +25,7 @@ class Dashboard extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Dashboard')
+    analytics.setCurrentScreen('داشبورد')
   }
 
   componentDidMount() {
@@ -35,7 +37,6 @@ class Dashboard extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('داشبورد')
     return (
       <View style={[r.full]}>
         <Navbar 
@@ -64,7 +65,7 @@ class Dashboard extends Component {
                 <Button
                   style={[r.rtl, r.paddH20, r.hCenter, { height: 120 }]}
                   ripple={'#ffffff11'}
-                  onPress={() => API.currentRestaurant(this.props.navigator, this.props.dispatch, item.id)}
+                  onPress={() => API.currentRestaurant(this.props, this.props.dispatch, item.id)}
                 >
                   <View style={[r.round15, r.overhide, { borderColor: '#fff', borderWidth: 5 }]}>
                     <Image
@@ -87,7 +88,7 @@ class Dashboard extends Component {
         {!this.props.state.dashboard && <EmptyList icon/> }
 
         <Notification />
-
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }

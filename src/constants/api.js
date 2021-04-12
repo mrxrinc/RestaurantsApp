@@ -1,6 +1,6 @@
 // APP wide Constants
 
-export const DEBUG = true
+export const DEBUG = false
 export const Version = 2
 // export const ContentType = 'application/json;charset=UTF-8'
 
@@ -14,7 +14,7 @@ export const Auth = DEBUG ?
 
 export const imageHeader = DEBUG ? 
   { Authorization: 'Basic Y2hpbGlkZXY6d2VsY29tZXRvY2hpbGlkZXY=' } : // DEVELOPMENT
-  { Authorization: 'Basic yeeeehhhaaaaa_Cowboy:))))' } // PRODUCTION
+  { Authorization: 'Basic yeeeehhhaaaaa_Cowboy:))))' } // PRODUCTION (no need actually)
 
 export const INIT = {
   platform: 'ios',

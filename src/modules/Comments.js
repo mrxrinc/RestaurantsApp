@@ -6,7 +6,7 @@ import Image from './components/image'
 import Input from './components/input'
 import Modal from './components/modal'
 import ModalView from './components/modalView'
-import * as asset from './assets'
+import { navigatorStyle, window } from './assets'
 import { Text, Icon } from './components/font'
 import Button, { ButtonLight } from './components/button'
 import Header from './components/header'
@@ -17,11 +17,13 @@ import ListFooter from './components/listFooter'
 import API from './utils/service'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
+import Notification from './components/notification'
+import FlashMessage from 'react-native-flash-message'
 
 
 class Comments extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -32,6 +34,7 @@ class Comments extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Comments')
+    analytics.setCurrentScreen('دیدگاه کاربران')
   }
 
   componentDidMount() {
@@ -79,7 +82,6 @@ class Comments extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('دیدگاه کاربران')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
@@ -265,6 +267,8 @@ class Comments extends Component {
           )}
         </View>
 
+        <Notification />
+
         <Tabbar 
           {...this.props}
           active = {''}
@@ -282,7 +286,7 @@ class Comments extends Component {
           hide={this.emptyReplyData}
           >
           <ModalView
-            style={[{ height: 300 }, !IOS && { marginTop: asset.window.height - 300 }]} // same problem fixed in android
+            style={[{ height: 300 }, !IOS && { marginTop: window.height - 300 }]} // same problem fixed in android
             visible={this.props.state.reply.visible}
           >
             <View style={[r.bgLight5, r.rtl, r.spaceBetween, r.hCenter, { height: 60 }]}>
@@ -341,7 +345,7 @@ class Comments extends Component {
             به زودی پشتیبانی چیلیوری بررسی خواهد کرد.
           </Text>       
         </Modal>
-
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }

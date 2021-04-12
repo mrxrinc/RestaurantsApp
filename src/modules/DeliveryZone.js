@@ -5,7 +5,7 @@ import MapView, { Polygon, Circle } from 'react-native-maps'
 import numeral from 'numeral'
 // import { Crashlytics} from 'react-native-fabric'
 import { View } from 'react-native-animatable'
-import { navigatorStyle } from './assets'
+import { navigatorStyle, mapStyle } from './assets'
 import Modal from './components/modal'
 import { Text, Icon } from './components/font'
 import Header from './components/header'
@@ -14,15 +14,15 @@ import Checkbox from './components/checkbox'
 import Navbar from './components/navbar'
 import Tabbar from './components/tabbar'
 import Loading from './components/loading'
-import * as asset from './assets'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class DeliveryZone extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
+
   constructor(props) {
     super(props)
     this.state = {
@@ -42,6 +42,7 @@ class DeliveryZone extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'DeliveryZones')
+    analytics.setCurrentScreen('محدوده سرویس دهی')
   }
 
   componentDidMount() {
@@ -98,7 +99,6 @@ class DeliveryZone extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('محدوده سرویس دهی')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
@@ -196,7 +196,7 @@ class DeliveryZone extends Component {
                   style = {r.map}
                   provider = {'google'}
                   fitToCoordinates = {{coordinates: this.state.area.polygon}}
-                  customMapStyle={asset.mapStyle}
+                  customMapStyle={mapStyle}
                   region = {this.state.area}
                   showsScale
                 >

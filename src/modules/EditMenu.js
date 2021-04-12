@@ -8,7 +8,7 @@ import IOS from './assets/platform'
 import Image from './components/image'
 import Modal from './components/modal'
 import ModalView from './components/modalView'
-import * as asset from './assets'
+import { navigatorStyle } from './assets'
 import { Text, Icon } from './components/font'
 import Button, { ButtonLight } from './components/button'
 import Header from './components/header'
@@ -20,11 +20,12 @@ import EmptyList from './components/emptyList'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
+import FlashMessage from 'react-native-flash-message'
 
 
 class EditMenu extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -43,6 +44,7 @@ class EditMenu extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Menu')
+    analytics.setCurrentScreen('ویرایش منو')
   }
 
   componentDidMount() {
@@ -91,7 +93,6 @@ class EditMenu extends Component {
   }
  
   render() {
-    // analytics.setCurrentScreen('ویرایش منو')
     return (
       <KeyboardAvoidingView style={[r.full, g.bgPrimary]} behavior='padding'>
         <Navbar
@@ -308,7 +309,7 @@ class EditMenu extends Component {
         />
 
         <Notification />
-
+        <FlashMessage position="top" style={[r.rtl]} />
       </KeyboardAvoidingView>
     )
   }

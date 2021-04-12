@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { View } from 'react-native'
+import { Navigation } from 'react-native-navigation'
 import { Text, Icon } from './font'
 import Button from '../components/button'
 import r from '../styles/rinc'
@@ -36,10 +37,12 @@ export default class Tabbar extends Component {
           ripple={'#ffffff11'}
           expandableRipple
           onPress={this.props.active !== 'home' ? () => {
-            this.props.navigator.resetTo({
-              screen: 'Home',
-              animationType: 'fade'
-            })
+            Navigation.setStackRoot(this.props.componentId, [{ 
+              component: {
+                name: 'Home',
+                options: { animations: { setStackRoot: { enabled: false } } }
+              }
+            }])
           } : null}
         >
           <Icon name={'logo'} size={iconSize + 3} style={[this.color('home')]}/>
@@ -54,9 +57,11 @@ export default class Tabbar extends Component {
           ripple={'#ffffff11'}
           expandableRipple
           onPress={this.props.active !== 'salesReport' ? () => {
-            this.props.navigator.push({
-              screen: 'SalesReport',
-              animationType: 'fade'
+            Navigation.push(this.props.componentId, { 
+              component: {
+                name: 'SalesReport',
+                options: { animations: { push: { enabled: false, waitForRender: true } } } 
+              } 
             })
           } : null}
         >
@@ -72,9 +77,11 @@ export default class Tabbar extends Component {
           ripple={'#ffffff11'}
           expandableRipple
           onPress={this.props.active !== 'FinancialReport' ? () => {
-            this.props.navigator.push({
-              screen: 'FinancialReport',
-              animationType: 'fade'
+            Navigation.push(this.props.componentId, { 
+              component: {
+                name: 'FinancialReport',
+                options: { animations: { push: { enabled: false, waitForRender: true } } } 
+              } 
             })
           } : null}
         >
@@ -90,9 +97,11 @@ export default class Tabbar extends Component {
           ripple={'#ffffff11'}
           expandableRipple
           onPress={this.props.active !== 'editMenu' ? () => {
-            this.props.navigator.push({
-              screen: 'EditMenu',
-              animationType: 'fade'
+            Navigation.push(this.props.componentId, { 
+              component: {
+                name: 'EditMenu',
+                options: { animations: { push: { enabled: false, waitForRender: true } } } 
+              } 
             })
           } : null}
         >
@@ -109,12 +118,14 @@ export default class Tabbar extends Component {
           expandableRipple
           onPress={
             this.props.active !== 'more' ? () => {
-              this.props.navigator.push({
-                screen: 'More',
-                animationType: 'fade'
+              Navigation.push(this.props.componentId, { 
+                component: {
+                  name: 'More',
+                  options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                } 
               })
             } : this.props.childOfMore ? () => { // now the childs of 'More' will pop back on 'More' tab press
-              this.props.navigator.pop()
+              Navigation.pop(this.props.componentId)
             } : null
           }
         >

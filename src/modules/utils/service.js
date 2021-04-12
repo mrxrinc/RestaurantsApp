@@ -1,6 +1,10 @@
+import React from 'react'
 import { AsyncStorage } from 'react-native'
 import axios from 'axios'
 import { checkInternetConnection } from 'react-native-offline'
+import { Navigation } from 'react-native-navigation'
+import { showMessage, hideMessage } from "react-native-flash-message"
+import Push from '../components/push'
 // import RNExitApp from 'react-native-exit-app'
 import * as api from '../../constants/api'
 import * as util from './index'
@@ -51,12 +55,12 @@ class LocalToken {
   }
 }
 
-class API {
+class API { //exported to use in loginOTP page
 
   localDB = new LocalToken
 
   versionControl = props => {
-    const { navigator, dispatch } = props
+    const { dispatch } = props
     dispatch(action.loadingStart())
     checkInternetConnection()
     .then(isConnected => {
@@ -90,15 +94,15 @@ class API {
             }
             dispatch(action.update(data))
             if(isForce || isNormal) {
-              navigator.resetTo({ screen: 'Update' })
+              Navigation.setStackRoot(props.componentId, [{ component: { name: 'Update' } }])
             } else {
               this.appInit(props)
             }
           } else {
             console.log('VERSION CONTROL STATUS FALSE')
-            this.showPush(props, {
+            this.showPush({
               message: resp.data.message_fa,
-              status: 'error',
+              status: 'danger',
               timer: 3
             })
           }
@@ -106,12 +110,16 @@ class API {
         .catch(err => {
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
-          // navigator.resetTo({ screen: 'Offline' })
+          dispatch(action.storeUser(null))
+          this.localDB.clearData()
+          this.localDB.clearChosenRestaurant()
+          Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
+
           console.log('VERSION CONTROL CATCH ERROR', err)
         })
       } else {
         console.log('IS_CONNECTED IS FALSE')
-        navigator.resetTo({ screen: 'Offline' })
+        Navigation.setStackRoot(props.componentId, [{ component: { name: 'Offline' } }])
       }
     })
     .catch(err => {
@@ -121,7 +129,7 @@ class API {
   }
 
   appInit = async props => {
-    const { navigator, dispatch } = props
+    const { dispatch } = props
     try {
       dispatch(action.loadingStart())
       this.localDB.getData()
@@ -143,16 +151,13 @@ class API {
               const firstToken = resp.data.result.session.token
               console.log('FRESH USER. FIRST TOKEN ===> ', firstToken)
               dispatch(action.loadingEnd())
-              navigator.resetTo({
-                screen: 'LoginOTP',
-                passProps: { firstToken }
-              })
+              Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP', passProps: { firstToken } } }])
             } else {
               console.log('INIT STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingEnd())
-              this.showPush(props, {
+              this.showPush({
                 message: resp.data.message_fa,
-                status: 'error',
+                status: 'danger',
                 timer: 3
               })
             }
@@ -161,9 +166,9 @@ class API {
             console.log('ERROR APP INIT REQUEST ===> ', err)
             dispatch(action.loadingEnd())
             util.handleOffline(props, true)
-            this.showPush(props, {
+            this.showPush({
               message: 'مشکلی برای اپلیکیشن پیش آمد. لطفا با پشتیبانی تماس بگیرید!',
-              status: 'error',
+              status: 'danger',
               timer: 3
             })
           })
@@ -189,20 +194,20 @@ class API {
                 }
                 dispatch(action.loadingEnd())
                 dispatch(action.storeUser(newData))
-                navigator.push({ screen: 'Dashboard' })
+                Navigation.push(props.componentId, { component : { name: 'Dashboard' } })
               } else {
                 console.log('CURRENT USER DETAIL STATUS FALSE ===> ', resp.data)
                 dispatch(action.loadingEnd())
                 this.localDB.clearData() // in case of broken local data
-                // util.toErrorPage(1011, navigator)
-                navigator.resetTo({ screen: 'Login' })
+                // util.toErrorPage(1011, props)
+                Navigation.setStackRoot(props.componentId, [{ component: { name: 'Login' } }])
               }
             })
             .catch(err => {
               console.log('FAIL ON GETTING USER DETAIL REQUEST ===> ', err)
               dispatch(action.loadingEnd())
               // dont clear local token here, coz if its broken we will get status false as we removing it there.
-              util.toErrorPage(1028, navigator)
+              util.toErrorPage(1028, props)
             })
         }
       })
@@ -216,14 +221,14 @@ class API {
     catch(err) {
       console.log('ERROR ON APPINIT TRY_CATCH!', err)
       dispatch(action.loadingEnd())
-      util.toErrorPage(1012, navigator)
+      util.toErrorPage(1012, props)
     }
   }
 
   login = (props, data) => {
     console.log('LOGIN INPUT DATA ==> ', data)
     const { username, password, firstToken } = data
-    const { navigator, dispatch } = props
+    const { dispatch } = props
     if(!props.state.loading) { // preventing double tap while one request is on progress!
       dispatch(action.loadingStart())
       if(username.trim().length === 0) {
@@ -261,7 +266,7 @@ class API {
             dispatch(action.storeUser(resp.data))
             this.localDB.setData(resp.data.result.session.token)
             axios.defaults.headers.common['token'] = resp.data.result.session.token
-            navigator.resetTo({ screen: 'Dashboard' })
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard' } }])
             console.log('TOKEN SAVED TO LOCAL') 
           } else {
             console.log('LOGIN STATUS FALSE ===> ', resp)
@@ -287,8 +292,94 @@ class API {
     }
   }
 
+  loginOtp = (props, data) => {
+    console.log('OTP INPUT DATA ==> ', data)
+    const { recipient, secret, otp } = data
+    const { dispatch } = props
+    if(!props.state.loading) { // preventing double tap while one request is on progress!
+      dispatch(action.loadingStart())
+      if(otp.trim().length === 0) {
+        dispatch(action.loadingEnd())
+        this.showNotification({
+          title: 'خطا!',
+          message: 'لطفا شماره موبایل خود را وارد کنید!',
+          type: 'alarm'
+        }, dispatch)
+      } else {
+        axios({
+          method: 'post',
+          url: api.URL + 'otp/verify',
+          data: {
+            recipient,
+            otp,
+            secret,
+            platform: api.INIT.platform,
+            build: api.INIT.build,
+            device_id: api.INIT.device_id,
+            deviceId: api.INIT.device_id,
+            device: api.INIT.device
+          }
+        })
+        .then(resp => {
+          if(resp.data.status) {
+            console.log('OTP VERIFY STATUS TRUE ===> ', resp.data)
+            dispatch(action.loadingEnd())
+            if(resp.data.result.isRegistered) {
+              dispatch(action.storeUser(resp.data))
+              this.localDB.setData(resp.data.result.session.token)
+              axios.defaults.headers.common['token'] = resp.data.result.session.token
+              Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard' } }])
+              console.log('TOKEN SAVED TO LOCAL') 
+            } else {
+              console.log('OTP VERIFY ISREGISTERED FALSE ===> ', resp.data)
+              dispatch(action.loadingEnd())
+              setTimeout(() => { // we need this coz the modal of verifyOTP need to compeletely be closed before this modal been shown!
+                this.showNotification({
+                  title: 'خطا!',
+                  message: 'این کاربر ثبت نشده است!',
+                  type: 'error'
+                }, dispatch)
+              }, 1500)
+            }
+          } else {
+            console.log('OTP REQUEST STATUS FALSE ===> ', resp)
+            dispatch(action.loadingEnd())
+            this.showNotification({
+              title: 'خطا!',
+              message: `${resp.data.message_fa}!`,
+              type: 'error'
+            }, dispatch)
+          }
+          return resp.data
+        })
+        .catch(err => {
+          dispatch(action.loadingEnd())
+          console.log('OTP REQUEST ERROR ===> ', err.response)
+          if(err.response.status === 400) {
+            setTimeout(() => { // we need this coz the modal of verifyOTP need to compeletely be closed before this modal been shown!
+              this.showNotification({
+                title: 'خطا!',
+                message: err.response.data.message_fa,
+                type: 'error'
+              }, dispatch)
+            }, 1500)
+          } else {
+            util.handleOffline(props, true)
+            setTimeout(() => { // for the same reson as up!
+              this.showNotification({
+                title: 'خطا!',
+                message: 'مشکلی در درخواست ورود پیش آمد! لطفا مجددا تلاش کنید.',
+                type: 'error'
+              }, dispatch)
+            }, 1500)
+          }
+        })
+      }
+    }
+  }
+
   logout = props => {
-    const { dispatch, navigator } = props
+    const { dispatch } = props
     dispatch(action.loadingIIStart())
     axios({
       method: 'get',
@@ -301,13 +392,13 @@ class API {
         dispatch(action.storeUser(null))
         this.localDB.clearData()
         this.localDB.clearChosenRestaurant()
-        navigator.resetTo({ screen: 'Login' }) 
+        Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
       } else {
         console.log('LOGOUT STATUS FALSE ', resp.data)
         dispatch(action.loadingIIEnd())
-        this.showPush(props, {
+        this.showPush({
           message: 'این کاربر قبلا خارج شده است!',
-          status: 'error'
+          status: 'danger'
         })
       }
     })
@@ -322,36 +413,43 @@ class API {
   forgetPassword = (props, username) => {
     const { dispatch } = props
     dispatch(action.loadingIIStart())
-    axios({
-      method: 'post',
-      url: 'user/forgotPassword',
-      data: {
-        identification: username
-      }
-    })
-    .then( resp => {
-      console.log('FORGET_PASSWORD STATUS TRUE ', resp.data)
-      if(resp.data.status) {
+    if(username.trim().length === 0) {
+      dispatch(action.loadingEnd())
+      this.showNotification({
+        title: 'خطا!',
+        message: 'لطفا ایمیل یا شماره موبایل خود را وارد کنید!',
+        type: 'alarm'
+      }, dispatch)
+    } else {
+      axios({
+        method: 'post',
+        url: 'user/forgotPassword',
+        data: {
+          identification: username
+        }
+      })
+      .then(resp => {
+        console.log('FORGET_PASSWORD STATUS TRUE ', resp.data)
+        if(resp.data.status) {
+          dispatch(action.loadingIIEnd())
+          dispatch(action.forgetPassword(resp.data.result.type))
+        } else {
+          console.log('FORGET_PASSWORD STATUS FALSE ', resp.data)
+          dispatch(action.loadingIIEnd())
+          this.showNotification({
+            title: 'خطا!',
+            message: resp.data.message_fa,
+            type: 'error'
+          }, dispatch)
+        }
+      })
+      .catch(err => {
+        console.log('FORGET_PASSWORD REQUEST ERROR ', err.response)
         dispatch(action.loadingIIEnd())
-        dispatch(action.forgetPassword(resp.data.result.type))
-      } else {
-        console.log('FORGET_PASSWORD STATUS FALSE ', resp.data)
-        dispatch(action.loadingIIEnd())
-        this.showPush(props, {
-          message: typeof resp.data.message_fa === 'string' ? 
-                    `${resp.data.message_fa}!` : 
-                    resp.data.message_fa[0].identification[0],
-          status: 'error',
-          timer: 1
-        })
-      }
-    })
-    .catch(err => {
-      console.log('FORGET_PASSWORD REQUEST ERROR ', err)
-      dispatch(action.loadingIIEnd())
-      util.handleOffline(props, true)
-      util.toErrorPage(1031, props.navigator)
-    })
+        util.handleOffline(props, true)
+        util.toErrorPage(1031, props.navigator)
+      })
+    }
   }
 
   resetForgetPasswordValue = dispatch => {
@@ -366,24 +464,22 @@ class API {
     dispatch(action.hideNotification({}))
   }
 
-  showPush = (props, option) => {
-    const { navigator } = props
-    navigator.showInAppNotification({
-      screen: 'Push',
-      passProps: { 
-        message: option.message,
-        status: option.status ? option.status : null
-      },
-      autoDismissTimerSec: option.timer ? option.timer : 2
+  showPush = option => {
+    option = option || {}
+    showMessage({
+      message: option.message ? option.message : '!',
+      type: option.status ? option.status : "default",
+      duration: option.timer ? option.timer * 1000 : 1850,
+      floating: true
     })
   }
 
   dashboard = (props, choosing = false) => {
-    const { dispatch, navigator } = props
+    const { dispatch } = props
     this.localDB.getChosenRestaurant()
     .then(chosenRestaurant => {
       if(!!chosenRestaurant && choosing === false){
-        this.currentRestaurant(navigator, dispatch, parseInt(chosenRestaurant)) // this will head to home 
+        this.currentRestaurant(props, dispatch, parseInt(chosenRestaurant)) // this will head to home 
       } else {
         dispatch(action.loadingStart())
         axios({
@@ -407,13 +503,15 @@ class API {
           dispatch(action.loadingEnd())
           util.handleOffline(props, true)
           if(err.response.data.status === false) {
-            navigator.resetTo({ screen: 'Login' })
-            this.showPush(props, {
-              message: 'این کاربر دسترسی به پنل ندارد!',
-              status: 'error',
-              timer: 3
-            })
             this.localDB.clearData()
+            Navigation.setStackRoot(props.componentId, [{ component: { name: 'LoginOTP' } }])
+            setTimeout(() => { // we need this coz the modal of verifyOTP need to compeletely be closed before this modal been shown!
+              this.showNotification({
+                title: 'خطا!',
+                message: 'این کاربر دسترسی به پنل ندارد!',
+                type: 'error'
+              }, dispatch)
+            }, 1500)
           } else {
             util.toErrorPage(1013, props.navigator)
           }
@@ -428,14 +526,23 @@ class API {
     })
   }
 
-  currentRestaurant = (navigator, dispatch, id) => {
+  currentRestaurant = (props, dispatch, id) => {
     console.log('CURRENT RESTAURANT ID SET TO ', id)
     dispatch(action.currentRestaurant(id))
     this.localDB.setChosenRestaurant(`${id}`)
-    navigator.resetTo({ 
-      screen: 'Home',
-      animationType: 'fade'
-     })
+    Navigation.setStackRoot(props.componentId, [{ 
+      component: {
+        name: 'Home',
+        options: {
+          animations: {
+            setStackRoot: {
+              enabled: true,
+              animationType: 'fade'
+            }
+          }
+        } 
+      } 
+    }])
   }
 
   home = props => { 
@@ -524,6 +631,151 @@ class API {
       dispatch(action.loadingEnd())
       util.handleOffline(props, true)
       util.toErrorPage(1017, props.navigator)
+    })
+  }
+
+  financialReport = (props, paginate = false) => {
+    const { dispatch } = props
+    let page = props.state.financialReport && props.state.financialReport.result.data ? 
+      Math.ceil(props.state.financialReport.result.data.length / 10) : 1
+    page = page === 0 ? 1 : page // avoiding zero division 
+    page = paginate ? page + 1 : 1 // no pagination means all the first data nedded
+    dispatch(action.loadingStart())
+    dispatch(action.hideEmpty({}))
+    const params = {
+      restaurantId: props.state.currentRestaurant,
+      page
+    }
+    axios({
+      method: 'get',
+      url: 'restaurantInvoice/list',
+      params 
+    })
+    .then( resp => {
+      console.log('FINANCIAL_REPORT STATUS TRUE ', resp.data.result.data)
+      if(resp.data.status) {
+        dispatch(action.loadingEnd())
+        if(page === 1) dispatch(action.loadFinancialReport(resp.data))
+        else dispatch(action.loadFinancialReportAdding(resp.data.result.data)); console.log('adding======', resp.data.result.data)
+        if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
+      } else {
+        console.log('FINANCIAL_REPORT STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1032, props.navigator)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_REPORT REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1033, props.navigator)
+    })
+  }
+
+  financialOrders = (props, invoiceId, paginate = false) => {
+    const { dispatch } = props
+    let page = props.state.financialOrders && props.state.financialOrders.result.data ? 
+      Math.ceil(props.state.financialOrders.result.data.length / 10) : 1
+      console.log('FINANCIAL_ORDERS PAGE NUMBER ', page)
+    page = page === 0 ? 1 : page // avoiding zero division 
+    page = paginate ? page + 1 : 1 // no pagination means all the first data needed
+    dispatch(action.loadingStart())
+    dispatch(action.hideEmpty({}))
+    const params = {
+      invoiceId,
+      page
+    }
+    axios({
+      method: 'get',
+      url: 'restaurantInvoice/orders',
+      params
+    })
+    .then( resp => {
+      console.log('FINANCIAL_ORDERS STATUS TRUE ', resp.data)
+      if(resp.data.status) {
+        dispatch(action.loadingEnd())
+        if(page === 1) dispatch(action.loadFinancialOrders(resp.data))
+        else dispatch(action.loadFinancialOrdersAdding(resp.data.result.data))
+        if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
+      } else {
+        console.log('FINANCIAL_ORDERS STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1034, props.navigator)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_ORDERS REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1035, props.navigator)
+    })
+  }
+
+  financialOrderDetail = (props, orderId) => {
+    const { dispatch } = props
+    dispatch(action.loadingStart())
+    dispatch(action.loadFinancialOrderDetail(null))
+    const params = { orderId }
+    axios({
+      method: 'get',
+      url: 'order/detailForInvoice',
+      params
+    })
+    .then( resp => {
+      if(resp.data.status) {
+        console.log('FINANCIAL_ORDER_DETAIL STATUS TRUE ', resp.data)
+        dispatch(action.loadingEnd())
+        dispatch(action.loadFinancialOrderDetail(resp.data))
+      } else {
+        console.log('FINANCIAL_ORDER_DETAIL STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1036, props)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_ORDER_DETAIL REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1037, props)
+    })
+  }
+
+  financialAmendments = (props, invoiceId, paginate = false) => {
+    const { dispatch } = props
+    let page = props.state.financialAmendments && props.state.financialAmendments.result.data ? 
+      Math.ceil(props.state.financialAmendments.result.data.length / 10) : 1
+      console.log('FINANCIAL_AMENDMENTS PAGE NUMBER ', page)
+    page = page === 0 ? 1 : page // avoiding zero division 
+    page = paginate ? page + 1 : 1 // no pagination means all the first data needed
+    dispatch(action.loadingStart())
+    dispatch(action.hideEmpty({}))
+    const params = {
+      invoiceId,
+      page
+    }
+    axios({
+      method: 'get',
+      url: 'restaurantInvoice/orderCorrections',
+      params
+    })
+    .then( resp => {
+      console.log('FINANCIAL_AMENDMENTS STATUS TRUE ', resp.data)
+      if(resp.data.status) {
+        dispatch(action.loadingEnd())
+        if(page === 1) dispatch(action.loadFinancialAmendments(resp.data))
+        else dispatch(action.loadFinancialAmendmentsAdding(resp.data.result.data))
+        if(!resp.data.result.data || resp.data.result.data.length === 0) dispatch(action.showEmpty({}))
+      } else {
+        console.log('FINANCIAL_AMENDMENTS STATUS FALSE ', resp.data)
+        dispatch(action.loadingEnd())
+        util.toErrorPage(1036, props)
+      }
+    })
+    .catch(err => {
+      console.log('FINANCIAL_AMENDMENTS REQUEST ERROR ', err)
+      dispatch(action.loadingEnd())
+      util.handleOffline(props, true)
+      util.toErrorPage(1037, props)
     })
   }
 
@@ -670,18 +922,16 @@ class API {
       if(resp.data.status) {
         this.editMenu(props, false, superGroup) // this also has LoadingII end and item index for reloading food options modalModal !
         if(status !== 1) {
-          this.showPush(props, {
+          this.showPush({
             message: resp.data.message_fa,
-            status: 'success',
-            timer: 1
+            status: 'success'
           })
         }
       } else {
         console.log('MENU ITEM STATUS CHANGE IS FALSE', resp.data)
-        this.showPush(props, {
+        this.showPush({
           message: resp.data.message_fa,
-          status: 'error',
-          timer: 3
+          status: 'alarm'
         })
       }
     })
@@ -689,10 +939,9 @@ class API {
       console.log('MENU ITEM STATUS CHANGE RQUEST FAILED ', err)
       dispatch(action.loadingIIEnd())
       util.handleOffline(props, true)
-      this.showPush(props, {
+      this.showPush({
         message: 'مشکلی در تغییر وضعیت غذا پیش آمد. لطفا دوباره سعی کنید!',
-        status: 'error',
-        timer: 3
+        status: 'alarm'
       })
     })
   }
@@ -729,10 +978,9 @@ class API {
         this.editMenu(props, false, superGroup) // this also has LoadingII end !
       } else {
         console.log('FOOD_OPTION ITEM STATUS CHANGE IS FALSE', resp.data)
-        this.showPush(props, {
+        this.showPush({
           message: resp.data.message_fa,
-          status: 'error',
-          timer: 3
+          status: 'alarm'
         })
       }
     })
@@ -740,10 +988,9 @@ class API {
       console.log('FOOD_OPTION ITEM STATUS CHANGE RQUEST FAILED ', err)
       dispatch(action.loadingIIEnd())
       util.handleOffline(props, true)
-      this.showPush(props, {
+      this.showPush({
         message: 'مشکلی در تغییر وضعیت غذا پیش آمد. لطفا دوباره سعی کنید!',
-        status: 'error',
-        timer: 3
+        status: 'alarm'
       })
     })
   }
@@ -799,13 +1046,13 @@ class API {
         console.log('COMMENTS STATUS TRUE ', resp.data)
         if(resp.data.status) {
           console.log('COMMENTS PAGE NUMBER ', page)
-          // dispatch(action.loadingEnd())
+          dispatch(action.loadingEnd())
           if(page === 1) dispatch(action.loadComments(resp.data))
           else dispatch(action.loadCommentsAdding(resp.data.result.comments))
           console.log('######### from services', resp.data.result.comments)
         } else {
           console.log('COMMENTS STATUS FALSE ', resp.data)
-          // dispatch(action.loadingEnd())
+          dispatch(action.loadingEnd())
           util.toErrorPage(1024, props.navigator)
         }
       })
@@ -842,9 +1089,9 @@ class API {
         if(message.length === 0) {
           console.log('TRIMMED MESSAGE IS ALSO EMPTY!!!!')
           dispatch(action.loadingIIEnd())
-          this.showPush(props, {
+          this.showPush({
             message: 'لطفا متن پیام خود را وارد نمایید!',
-            status: 'error'
+            status: 'danger'
           })
         } else {
           axios({
@@ -863,16 +1110,16 @@ class API {
               dispatch(action.loadingIIEnd())
               this.unloadReplyData(dispatch)
               this.comments(props, false, true) // args => (props, loading, reload comments after reply)
-              this.showPush(props, {
+              this.showPush({
                 message: resp.data.message_fa,
                 status: 'success'
               })
             } else {
               console.log('REPLY STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingIIEnd())
-              this.showPush(props, {
+              this.showPush({
                 message: `${resp.data.message_fa}!`,
-                status: 'error'
+                status: 'danger'
               })
             }
           })
@@ -880,19 +1127,19 @@ class API {
             console.log('REPLY REQUEST ERROR ===> ', err)
             dispatch(action.loadingIIEnd())
             util.handleOffline(props, true)
-            this.showPush(props, {
+            this.showPush({
               message: 'مشکلی در درخواست پاسخ پیش آمد! لطفا مجددا تلاش کنید.',
-              status: 'error'
+              status: 'danger'
             })
           })
         }
       } else {
         console.log('MESSAGE IS EMPTY')
         dispatch(action.loadingIIEnd())
-          this.showPush(props, {
-            message: 'لطفا متن پیام خود را وارد نمایید!',
-            status: 'error'
-          })
+        this.showPush({
+          message: 'لطفا متن پیام خود را وارد نمایید!',
+          status: 'danger'
+        })
       }
     }
   }
@@ -920,9 +1167,9 @@ class API {
             } else {
               console.log('REPORT_COMMENT STATUS FALSE ===> ', resp.data)
               dispatch(action.loadingIIEnd())
-              this.showPush(props, {
+              this.showPush({
                 message: `${resp.data.message_fa}!`,
-                status: 'error'
+                status: 'danger'
               })
             }
           })
@@ -930,9 +1177,9 @@ class API {
             console.log('REPORT_COMMENT REQUEST ERROR ===> ', err)
             dispatch(action.loadingIIEnd())
             util.handleOffline(props, true)
-            this.showPush(props, {
+            this.showPush({
               message: 'مشکلی در درخواست گزارش پیش آمد! لطفا مجددا تلاش کنید.',
-              status: 'error'
+              status: 'danger'
             })
           })
     }
@@ -978,92 +1225,3 @@ export default new API()
 
 
 
-
-
-
-
-
-
-
-
-
-// some junk code 
-
-// fetch(`${api.URL}user/login`, {
-  //   method: 'POST',
-  //   headers: {
-  //     Accept: 'application/json',
-  //     Authorization: api.Auth,
-  //     token: firstToken,
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({
-  //     username: data.email,
-  //     password: data.password
-  //   })
-  // })
-  // .then(res => res.json())
-  // .then(resp => {
-  //   console.log('LOGIN RESP ===> ', resp)
-  // })
-  // .catch(err => {
-  //   console.log('LOGIN REQUEST ERROR ===> ', err)
-  // })
-  
-  
-  
-// fetch(`${api.URL}food/changeFoodStatus`, { 
-  //   method: 'put',
-  //   headers: {
-  //     'Accept': 'application/json',
-  //     'Content-Type': 'application/json;charset=UTF-8',
-  //     Authorization: api.Auth
-  //   },
-  //   body: JSON.stringify({
-  //     foodId: id,
-  //     foodStatus: status
-  //   }),
-  // })
-  // .then(res => res.json())
-  // .then(resp => {
-  //   console.log(resp)
-  // })
-  // .catch(err => {
-  //   console.log('FIRST CHECK ERR ===> ', err)
-  // })
-
-
-
-
-// some of foosStatusChange junk code _ delete at the end of project
-  // const aa = superGroup.map(a1 => {
-  //   if(a1.groupId  === group.groupId){
-  //     const bb = a1.map(a2 => {
-  //       if(a2.foodOptionId === item.foodOptionId) {
-  //         return { ...a2, status: status === 1 ? 2 : 1 }
-  //       }
-  //       return { ...a2 }
-  //     })
-  //     return { ...a1, bb }
-  //   }
-  // })
-  // if(status === 1) {
-  //   this.loadFoodOptions(props, {
-  //     status: 2,
-  //     ...superGroup
-  //   })
-  //   this.showPush(props, {
-  //     message: resp.data.message_fa,
-  //     timer: 1
-  //   })
-  // } else {
-  //   this.loadFoodOptions(props, {
-  //     status: 1,
-  //     ...superGroup
-  //   })
-  //   this.showPush(props, {
-  //     message: resp.data.message_fa,
-  //     status: 'success',
-  //     timer: 1
-  //   })
-  // }

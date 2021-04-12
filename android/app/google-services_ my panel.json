@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "692839315977",
+    "firebase_url": "https://chiliveryrestaurants.firebaseio.com",
+    "project_id": "chiliveryrestaurants",
+    "storage_bucket": "chiliveryrestaurants.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:692839315977:android:3bdc584348c01a61",
+        "android_client_info": {
+          "package_name": "com.chilivery.chiliveryrestaurant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "692839315977-qvebkdgaf6d1f5cn26aefj9ppp60516b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_jh0DQGXiBEdMgo7YTfuGFqqKzfjwuTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "692839315977-qvebkdgaf6d1f5cn26aefj9ppp60516b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

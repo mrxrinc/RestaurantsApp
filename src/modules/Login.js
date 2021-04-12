@@ -13,11 +13,12 @@ import * as g from './styles/general'
 import API from './utils/service'
 import Notification from './components/notification'
 import * as util from './utils'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class Login extends Component {
   static options = () => navigatorStyle
+
   constructor(props) {
     super(props)
     this.state = { 
@@ -27,12 +28,13 @@ class Login extends Component {
       passwordFocused: false,
       firstToken: props.firstToken
     }
+    
+    analytics.setCurrentScreen('صفحه ورود')
   }
 
   login = () => API.login(this.props, this.state)
 
   render() {
-    // analytics.setCurrentScreen('صفحه ورود')
     return (
       <View style={[r.full]}>
         <Navbar 

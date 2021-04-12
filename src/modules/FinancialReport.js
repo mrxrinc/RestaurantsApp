@@ -1,31 +1,30 @@
 import React, { Component } from 'react'
-import { View, ScrollView, TextInput, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native'
+import { View, ScrollView, KeyboardAvoidingView, FlatList, RefreshControl } from 'react-native'
 import { connect } from 'react-redux'
+import { Navigation } from 'react-native-navigation'
 import * as Anim from 'react-native-animatable'
 import numeral from 'numeral'
-// import { Crashlytics} from 'react-native-fabric'
 import PersianCalendarPicker from 'react-native-persian-calendar-picker'
 import Modal from 'react-native-modal'
 import IOS from './assets/platform'
 import Image from './components/image'
 import ModalView from './components/modalView'
 import { Text, Icon } from './components/font'
-import Button, { ButtonLight } from './components/button'
+import Button from './components/button'
 import Header from './components/header'
 import Navbar from './components/navbar'
 import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-import * as asset from './assets'
-import * as util from './utils'
+import { navigatorStyle } from './assets'
 import API from './utils/service'
 import Loading from './components/loading'
 import ListFooter from './components/listFooter'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 class FinancialReport extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -37,81 +36,47 @@ class FinancialReport extends Component {
       orderId: '',
       showOrderDetail: false,
       showDatePicker: false,
-
-      data: {
-        invoices: [
-          {
-            id: 'CHL-INV-4723PK',
-            orderCount: 8,
-            orderCorrectionCount: 2,
-            orderTotalPrices: 250100,
-            orderCorrectionTotalPrices: -30000,
-            price: 220100,
-            createdAt: '1398/05/01',
-            period: '(1398/04/01 تا 1398/04/31)',
-            status: 'در انتظار پرداخت'
-          },
-          {
-            id: 'CHL-INV-51R34P',
-            orderCount: 10,
-            orderCorrectionCount: 1,
-            orderTotalPrices: 275200,
-            orderCorrectionTotalPrices: 5000,
-            price: 280200,
-            createdAt: '1398/04/01',
-            period: '(1398/03/01 تا 1398/03/31)',
-            status: 'پرداخت شده'
-          }
-        ],
-        restaurant: {
-          id: 3,
-          slug: 'jikjikberyan',
-          name: 'جیک جیک بریان',
-          contractPeriod: 'ماهانه',
-          salePercentage: 10,
-          hasCampaign:  true,
-          profile: 'https://media.chilivery.com/img/restaurantLogo/a17fe776dc87286b9680d98b766e76ee/restaurantProfile-جیکجیکبریان-997.jpg',
-          cover: 'https://media.chilivery.com/img/restaurantCover/73877749bf8eecdcfe08f70fd54e5352/restaurantCover-جیکجیکبریان-110943.png',
-          mobileCover: 'https://media.chilivery.com/img/mobileTag/8363a91ac9992569fa59c9f92f033dbb/restaurantMobileCover-جیکجیکبریان-110945.png'
-        },
-        pagination: {
-          total: 37,
-          currentPage: 1,
-          lastPage: 4
-        }
-      }
     }
     // Crashlytics.setUserName(this.props.state.user.result.session.user.fullName)
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Financial Report')
+    analytics.setCurrentScreen('گزارش فروش')
   }
 
   componentDidMount() {
-    // this.fetchData()
+    this.fetchData()
   }
 
   fetchData = paginate => {
     if(paginate == null) paginate = false
     console.log('PAGE NUMBER 00', paginate)
-    API.salesReport(this.props, paginate, this.state.dateFrom, this.state.dateTo, this.state.period, this.state.orderId)
+    API.financialReport(this.props, paginate)
   }
 
   loadMore = () => {
-    this.fetchData(true) // this adds items to current list
-    // API.salesReport(this.props, true, this.state.dateFrom, this.state.dateTo, this.state.period) // second arg is for pagination
+    API.financialReport(this.props, true) // second arg is for pagination
   }
 
-  showReportDetail = (id) => {
-    this.props.navigator.push({
-      screen: 'FinancialReportDetail',
-      animationType: 'fade',
-      passProps: { id }
+  showReportDetail = (invoiceId) => {
+    Navigation.push(this.props.componentId, { 
+      component: {
+      name: 'FinancialReportDetail',
+      passProps: { invoiceId },
+      options: { animations: { push: { enabled: false, waitForRender: true } } } 
+      } 
     })
   }
 
   render() {
-    // analytics.setCurrentScreen('گزارش فروش')
+    const data = this.props.state.financialReport ? this.props.state.financialReport.result : null
+    const showMore = data && data.pagination.total !== data.data.length ? () => (
+      <ListFooter 
+        items={data.data} 
+        loading={this.props.state.loading}
+        onPress={this.loadMore} 
+      />
+    ) : null
     return (
       <KeyboardAvoidingView style={[r.full, g.bgPrimary]} behavior='padding'>
         <Navbar
@@ -121,8 +86,8 @@ class FinancialReport extends Component {
         />
 
         <View style={r.full}>
-          {this.props.state.loading && !this.props.state.salesReport && <Loading />}
-          {this.state.data && (
+          {this.props.state.loading && !data && <Loading />}
+          {data && (
             <View
               style={r.full}
               animation={'fadeIn'}
@@ -144,14 +109,14 @@ class FinancialReport extends Component {
                 <Header style={[r.hCenter]}>
                   <View style={[r.topM30, r.round15, g.homeProfile]}>
                     <Image
-                      key={this.state.data.restaurant.profile}
-                      uri={this.state.data.restaurant.profile}
+                      key={data.restaurant.profile}
+                      uri={data.restaurant.profile}
                       style={[r.round15, g.homeAvatar]}
                       resizeMode={'cover'}
                     />
 
-                    {this.state.data.restaurant.hasCampaign &&
-                      this.state.data.restaurant.salePercentage > 0 && (
+                    {data.restaurant.hasCampaign &&
+                      data.restaurant.salePercentage > 0 && (
                       <View style={[r.absolute, g.bgRedLight, r.center, g.homeSalePercent]}>
                         <Text
                           bold
@@ -161,7 +126,7 @@ class FinancialReport extends Component {
                           includefontPadding={false}
                           style={[r.centerText, r.white]}
                         >
-                          ٪{this.state.data.restaurant.salePercentage}
+                          ٪{data.restaurant.salePercentage}
                         </Text>
                       </View>
                     )}
@@ -169,7 +134,7 @@ class FinancialReport extends Component {
                   
                   <View style={[r.hCenter]}>
                     <Text bold multiline size={16} style={[r.white, r.centerText, r.margin10]}>
-                      گزارش فروش {this.state.data.restaurant.name}
+                      گزارش فروش {data.restaurant.name}
                     </Text>
 
                     <View style={[r.rtl, r.hCenter ]}>
@@ -178,7 +143,7 @@ class FinancialReport extends Component {
                           نوع تسویه حساب:
                         </Text>
                         <Text size={16} bold style={[g.accent]}>
-                          {this.state.data.restaurant.contractPeriod}
+                          {data.restaurant.contractPeriod}
                         </Text>
                     </View>
 
@@ -189,15 +154,9 @@ class FinancialReport extends Component {
 
                 <View style={[r.topM20, r.paddH15]}>
                   <FlatList 
-                    data={this.state.data.invoices}
+                    data={data.data} // second 'data' is from api. first one is my variable for redux financialReport data
                     keyExtractor={item => item.id}
-                    ListFooterComponent={() => (
-                      <ListFooter 
-                        items={this.state.data.invoices} 
-                        loading={this.props.state.loading}
-                        onPress={this.loadMore} 
-                      />
-                    )}
+                    ListFooterComponent={showMore}
                     renderItem={({ item }) => (
                       <OrderItem
                         {...item}
@@ -427,6 +386,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(FinancialReport)
 
 const OrderItem = props => (
   <Anim.View
+    key={props.id}
     style={[r.wFull, r.shadow5, r.bottomM40, r.overhide]}
     animation={'fadeInUp'}
     duration={150}
@@ -434,8 +394,12 @@ const OrderItem = props => (
     useNativeDriver
   >
     <View style={[r.bottomM5, r.leftP10, r.rtl]}>
-      {/* <Text style={[r.white]} size={14} bold>هفته اول تیر ماه</Text> */}
-      <Text style={[r.grayMid, r.rightM10]} size={13} bold>{props.period}</Text>
+      <Text style={[r.grayMid]} size={16}>
+        <Text>از </Text>
+        <Text>{props.startPeriod}</Text>
+        <Text> تا </Text>
+        <Text>{props.endPeriod}</Text>
+      </Text>
     </View>
 
     <View style={[r.wFull, r.bgLight2, r.round15, r.shadow5, r.bottomM10, r.overhide]}>
@@ -566,27 +530,3 @@ const PriceText = ({children, bold}) => (
     {children}
   </Text>
 )
-
-// const ListFooter = ({ props, onPress }) => (
-//   <View style={[r.center, r.wFull, r.bottomM10, { height: 60 }]}>
-//     {(props.salesReport.result.orders.length >= 20 || props.loading) && (
-//       <ButtonLight
-//         style={[r.round30, r.center, { width: 80, height: 40 }]}
-//         onPress={onPress}
-//       >
-//       {props.loading ? (
-//         <Loading /> 
-//       ) : (
-//         <Icon 
-//           name={'right'} 
-//           size={16} 
-//           style={[r.rotate90, r.white, r.centerText, { width: 13 }]} 
-//         />
-//       )}
-//       </ButtonLight>
-//     )}
-
-//     {!props.loading && props.salesReport.result.orders.length === 0 && <EmptyList />}
-//     <EmptyList />
-//   </View>
-// )

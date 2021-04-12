@@ -21,6 +21,10 @@ export default {
   currentRestaurant: null, // this should be null in production
   home: null,
   salesReport: null,
+  financialReport: null,
+  financialOrders: null,
+  financialOrderDetail: null,
+  financialAmendments: null,
   order: null,
   editMenu: null,
   searchedFood: null,

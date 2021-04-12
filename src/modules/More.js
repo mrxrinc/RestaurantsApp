@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { View, ScrollView, Linking } from 'react-native'
 import { connect } from 'react-redux'
+import { Navigation } from 'react-native-navigation'
 // import { Crashlytics} from 'react-native-fabric'
 import ActionModal from './components/actionModal'
 // import Image from './components/image'
@@ -14,27 +15,29 @@ import Tabbar from './components/tabbar'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
+import FlashMessage from 'react-native-flash-message'
 
 
 class More extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
   constructor(props) {
     super(props)
     this.state = {
       showContactModal: false,
       showLogoutModal: false,
       phoneNumberMenu: '02142091404',
-      phoneNumberDeliveryZones: '02142091408',
+      phoneNumberDeliveryZones: '02142091403',
       phoneNumberTrade: '02142091409',
       phoneNumberComments: '02142091410',
-      phoneNumberMotochili: '02142091470',
+      phoneNumberMotochili: '02141096470',
       link: 'https://t.me/chilivery_menu'
     }
     // Crashlytics.setUserName(this.props.state.user.result.session.user.fullName)
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'More')
+    analytics.setCurrentScreen('بیشتر...')
   }
 
   callPhoneMenu = () => {
@@ -63,7 +66,6 @@ class More extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('بیشتر...')
     return (
       <View style={[r.full, g.bgPrimary]}>
         <Navbar
@@ -105,10 +107,12 @@ class More extends Component {
               icon={'store'}
               title={'انتخاب رستوران / شعبه'}
               onPress={() => {
-                this.props.navigator.push({ 
-                  screen: 'Dashboard',
-                  animationType: 'fade',
-                  passProps: { hasBack: true }
+                Navigation.push(this.props.componentId, { 
+                  component: {
+                    name: 'Dashboard',
+                    passProps: { hasBack: true },
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
                 })
               }}
             />
@@ -120,10 +124,14 @@ class More extends Component {
             <RowItem 
               icon={'pins'}
               title={'محدوده سرویس دهی'}
-              onPress={() => this.props.navigator.push({ 
-                screen: 'DeliveryZone',
-                animationType: 'fade',
-               })}
+              onPress={() => {
+                Navigation.push(this.props.componentId, { 
+                  component: {
+                    name: 'DeliveryZone',
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
+                })
+              }}
             />
             <RowItem 
               icon={'phone'}
@@ -150,10 +158,14 @@ class More extends Component {
             <RowItem 
               icon={'info'}
               title={'اطلاعات رستوران'}
-              onPress={() => this.props.navigator.push({ 
-                screen: 'RestaurantDetail',
-                animationType: 'fade',
-               })}
+              onPress={() => {
+                Navigation.push(this.props.componentId, { 
+                  component: {
+                    name: 'RestaurantDetail',
+                    options: { animations: { push: { enabled: false, waitForRender: true } } } 
+                  } 
+                })
+              }}
             />
             <RowItem 
               icon={'logout'}
@@ -270,6 +282,7 @@ class More extends Component {
           </View>
         </ActionModal>
           
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   }

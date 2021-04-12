@@ -33,5 +33,5 @@ export default Push = props => (
 const handleBg = props => {
   if (props.status === 'success') return '#00CA00'
   if (props.status === 'error') return '#FF3E3E'
-  return '#eeeff1'
+  return 'transparent'
 }

@@ -7,12 +7,12 @@ import { ButtonLight } from './components/button'
 import Loading from './components/loading'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 import API from './utils/service'
 
 
 class Update extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   enterApp = () => {
     API.appInit(this.props)
@@ -23,7 +23,7 @@ class Update extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('صفحه آپدیت') 
+    analytics.setCurrentScreen('صفحه آپدیت') 
     return (
       <View style={[r.full, g.bgPrimary]}>
         <View style={[r.full, r.center, r.topP20]}>

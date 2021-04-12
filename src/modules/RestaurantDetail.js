@@ -7,7 +7,7 @@ import numeral from 'numeral'
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps'
 import LinearGradient from 'react-native-linear-gradient'
 import Image from './components/image'
-import * as asset from './assets'
+import { navigatorStyle, mapStyle } from './assets'
 import { Text, Icon } from './components/font'
 // import Button from './components/button'
 import Header from './components/header'
@@ -18,11 +18,11 @@ import CustomMarker from './components/marker'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import API from './utils/service'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
 
 
 class RestaurantDetail extends Component {
-  static navigatorStyle = asset.navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -30,6 +30,7 @@ class RestaurantDetail extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Restaurant Detail')
+    analytics.setCurrentScreen('اطلاعات رستوران')
   }
 
   componentDidMount() {
@@ -37,7 +38,6 @@ class RestaurantDetail extends Component {
   }
 
   render() {
-    // analytics.setCurrentScreen('اطلاعات رستوران')
     const detail = this.props.state.restaurantDetail ? this.props.state.restaurantDetail.result : null
     const latitude = detail ? parseFloat(detail.point.split(' ')[0]) : null
     const longitude = detail ? parseFloat(detail.point.split(' ')[1]) : null
@@ -217,7 +217,7 @@ class RestaurantDetail extends Component {
                             latitudeDelta: 0.003,
                             longitudeDelta: 0.003,
                           }}
-                          customMapStyle={asset.mapStyle}
+                          customMapStyle={mapStyle}
                           style={[r.map, r.wFull, { height: 200 }]}
                         >
                           <Marker coordinate={{ latitude, longitude }}>

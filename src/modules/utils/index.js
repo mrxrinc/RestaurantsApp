@@ -1,3 +1,5 @@
+
+import { Navigation } from 'react-native-navigation'
 import j from 'jalaali-js'
 
 export const dateReform = date => {
@@ -13,23 +15,18 @@ export const jalali = date => {
   return `${jalali.jy}/${jalali.jm}/${jalali.jd}`
 }
 
-export const toErrorPage = (code, navigator) => {
-  navigator.resetTo({
-    screen: 'Error',
-    passProps: {
-      errorCode: code
-    }
-  })
+export const toErrorPage = (code, props) => {
+  Navigation.setStackRoot(props.componentId, [{ component: { name: 'Dashboard', passProps: { errorCode: code } } }])
 }
 
 export const handleOffline = (props, redux = false) => {
   const { navigator, state } = props
   console.log(state.network)
   if (redux === false) {
-    navigator.resetTo({ screen: 'Splash' }) 
+    Navigation.setStackRoot(props.componentId, [{ component: { name: 'Splash' } }])
   } else {
     if(state.network.isConnected === false){
-      navigator.resetTo({ screen: 'Offline' })
+      Navigation.setStackRoot(props.componentId, [{ component: { name: 'Offline' } }])
     } 
     else return null
   }
@@ -42,3 +39,34 @@ export const toEnglishDigits = text => {
    })
    return text
  }
+
+
+ export const rateColor = rate => {
+   // Rate colors
+  const rating = {
+    rate1: '#e66230',
+    rate2: '#e69717',
+    rate3: '#cec20c',
+    rate4: '#97c21e',
+    rate5: '#4fc238',
+    gray: '#d4d7da'
+  }
+
+  rate = typeof rate === 'number' ? rate : 0
+  switch (Math.floor(rate)) {
+    case 0:
+      return rating.gray
+    case 1:
+      return rating.rate1
+    case 2:
+      return rating.rate2
+    case 3:
+      return rating.rate3
+    case 4:
+      return rating.rate4
+    case 5:
+      return rating.rate5
+    default:
+      return rating.rate1
+  }
+}

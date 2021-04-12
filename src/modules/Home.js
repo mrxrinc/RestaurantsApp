@@ -17,10 +17,13 @@ import API from './utils/service'
 import * as r from './styles/rinc'
 import * as g from './styles/general'
 import Notification from './components/notification'
-// import analytics from '../constants/analytics'
+import analytics from '../constants/analytics'
+import FlashMessage from "react-native-flash-message"
+import { rateColor } from './utils'
+
 
 class Home extends Component {
-  static navigatorStyle = navigatorStyle
+  static options = () => navigatorStyle
 
   constructor(props) {
     super(props)
@@ -28,7 +31,7 @@ class Home extends Component {
     // Crashlytics.setUserEmail(this.props.state.user.result.session.user.email)
     // Crashlytics.setUserIdentifier(`${this.props.state.user.result.session.user.id}`)
     // Crashlytics.setString('Screen', 'Home')
-    // analytics.setCurrentScreen('صفحه اصلی')
+    analytics.setCurrentScreen('صفحه اصلی')
   }
 
   componentDidMount() {
@@ -142,8 +145,8 @@ class Home extends Component {
                           کیفیت غذا
                         </Text>
                         <View 
-                          style={[g.bgGreenLight, r.round5, r.rtl, r.center, 
-                            r.paddH5, r.leftM10, { height: 25 }
+                          style={[r.round5, r.rtl, r.center, 
+                            r.paddH5, r.leftM10, { height: 25, backgroundColor: rateColor(this.props.state.home.result.rate.foodQuality) }
                           ]}
                         >
                           <Text bold size={17} height={15} lineHeight={25} style={[r.white]}>
@@ -163,8 +166,8 @@ class Home extends Component {
                           سرعت ارسال
                         </Text>
                         <View 
-                          style={[g.bgAccent, r.round5, r.rtl, r.center, 
-                            r.paddH5, r.leftM10, { height: 25 }
+                          style={[r.round5, r.rtl, r.center, 
+                            r.paddH5, r.leftM10, { height: 25, backgroundColor: rateColor(this.props.state.home.result.rate.deliverySpeed) }
                           ]}
                         >
                           <Text bold size={17} height={15} lineHeight={25} style={[r.white]}>
@@ -249,7 +252,8 @@ class Home extends Component {
           active = {'home'}
           notificationCount = {null}  // this must be null if we dont have count
         />
-          
+        
+        <FlashMessage position="top" style={[r.rtl]} />
       </View>
     )
   } 
@@ -350,8 +354,8 @@ const FoodItem = ({title, image, count, rate}) => (
         </Text>
 
         <View 
-          style={[g.bgGreenLight, r.round5, r.rtl, r.center, 
-            r.paddH5, r.leftM20, { height: 25 }
+          style={[r.round5, r.rtl, r.center, 
+            r.paddH5, r.leftM20, { height: 25, backgroundColor: rateColor(rate) }
           ]}
         >
           <Text bold size={15} height={16} lineHeight={23} style={[r.white]}>
